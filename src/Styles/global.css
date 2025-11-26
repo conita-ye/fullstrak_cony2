@@ -1,0 +1,34 @@
+
+:root {
+  /* Paleta rosita claro + morado pastel */
+  --primary-color: #ff9adf;    /* rosita claro - para elementos primarios */
+  --primary-dark:  #c084fc;    /* morado medio - para hover/variantes */
+  --primary-light: #ffd1f7;    /* tono más claro para degradados */
+  --text-on-primary: #1b0022;  /* texto sobre botones pastel (oscuro para contraste) */
+
+  --accent-color: #b187ff;     /* morado suave */
+  --muted-text: #6b4b6f;
+}
+
+/* Botón primario con degradado pastel */
+.btn-primary {
+  background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-light) 100%);
+  border-color: transparent;
+  color: var(--text-on-primary);
+  box-shadow: none;
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+/* Hover sutil para mantener la estética pastel */
+.btn-primary:hover {
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+  background: linear-gradient(90deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+  color: #ffffff; /* opcional: texto blanco al hacer hover */
+}
+
+/* Clase de utilidad: texto primario usa la variable del tema */
+.text-primary { color: var(--primary-color) !important; }
+
+/* Minimal utility */
+.min-vh-50 { min-height: 50vh; }

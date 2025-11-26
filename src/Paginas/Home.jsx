@@ -8,78 +8,50 @@ const Home = () => {
   const [productosDestacados, setProductosDestacados] = useState([]);
 
   useEffect(() => {
-    let mounted = true;
-
-    const fetchProductos = async () => {
-      try {
-        // soporta tanto funciones síncronas como promesas
-        const productos = await Promise.resolve(obtenerProductos());
-        if (mounted && Array.isArray(productos)) {
-          setProductosDestacados(productos.slice(0, 3));
-        }
-      } catch (error) {
-        // registro simple de errores para facilitar debugging
-        // en producción se puede mostrar UI de error o usar un logger
-        console.error('Error cargando productos:', error);
-      }
-    };
-
-    fetchProductos();
-
-    return () => {
-      mounted = false;
-    };
+    const productos = obtenerProductos();
+    setProductosDestacados(productos.slice(0, 3));
   }, []);
 
   const caracteristicas = [
-    { icono: <FaShippingFast />, titulo: 'Envío Gratis', descripcion: 'En pedidos sobre $50.000' },
-    { icono: <FaShieldAlt />, titulo: 'Garantía', descripcion: 'Hasta 3 años de garantía en productos seleccionados' },
-    { icono: <FaHeadset />, titulo: 'Soporte', descripcion: 'Atención personalizada para gamers' }
+    { icono: <FaShippingFast />, titulo: 'Envío Gratis', descripcion: 'En compras sobre $200.000' },
+    { icono: <FaShieldAlt />, titulo: 'Garantía', descripcion: 'Hasta 2 años de garantía' },
+    { icono: <FaHeadset />, titulo: 'Soporte', descripcion: 'Asistencia técnica especializada' }
   ];
 
   return (
-    <div>
+    <div className="home-page">
       {/* HERO */}
-      <section className="hero-section position-relative py-5 hero-cony">
-        <div className="container-fluid py-5 px-5">
+      <section className="hero-section-cony hero-large">
+        <div className="container-fluid hero-inner">
           <div className="row align-items-center justify-content-center">
-            <div className="col-lg-6 d-flex flex-column justify-content-center align-items-start" style={{ height: '100%' }}>
-              <h1 className="display-3 fw-bold mb-3 hero-title-cony">
-                Eleva tu <span className="text-accent-cony">experiencia</span> gaming
+            <div className="col-lg-6 hero-left d-flex flex-column justify-content-center">
+              <h1 className="display-3 fw-bold hero-title-cony">
+                Eleva tu <span className="text-accent-cony">Experiencia</span> Gaming
               </h1>
-              <p className="lead mb-4 hero-sub-cony">
-                Accesorios y tarjetas digitales pensadas para ti. Setup rosado, poder competitivo — todo en un solo lugar.
+
+              <p className="lead hero-sub-cony">
+                Encuentra periféricos y accesorios de alto rendimiento. Potencia tu juego con equipo pensado para ganar.
               </p>
 
-              <div className="d-flex gap-3">
+              <div className="d-flex gap-3 hero-actions">
                 <Link to="/productos" className="btn btn-cony btn-lg">
                   Explorar Productos <FaArrowRight className="ms-2" />
                 </Link>
 
-                <Link to="/contacto" className="btn btn-outline-light btn-sm align-self-center">
-                  Contáctanos
-                </Link>
+                <div className="d-flex gap-2 hero-quick-links">
+                  <Link to="/contacto" className="btn btn-outline-light btn-sm">Contáctanos</Link>
+                  <Link to="/nosotros" className="btn btn-outline-light btn-sm">Conócenos</Link>
+                </div>
               </div>
             </div>
 
-            <div className="col-lg-6 text-center position-relative">
+            <div className="col-lg-6 hero-right text-center position-relative">
               <img
-                src="https://images.unsplash.com/photo-1601758003122-3c5b5d9a8b4b?w=1400&auto=format&fit=crop&q=80"
-                alt="Setup rosa gamer"
-                className="img-fluid hero-image-cony"
-                style={{
-                  maxHeight: '640px',
-                  width: '70%',
-                  minWidth: '160px',
-                  borderRadius: '20px',
-                  boxShadow: '0 20px 60px rgba(122,46,188,0.18)',
-                  transform: 'perspective(1000px) rotateY(-6deg)',
-                  objectFit: 'cover',
-                  margin: '0 auto'
-                }}
+                src="https://i.pinimg.com/736x/47/13/e7/4713e77f23a55b5d954c0788a94a5334.jpg"
+                alt="Setup Gaming"
+                className="hero-image-cony"
               />
 
-              {/* decoración sutil */}
               <div className="hero-stripe hero-stripe-1" />
               <div className="hero-stripe hero-stripe-2" />
             </div>
@@ -93,9 +65,9 @@ const Home = () => {
           <div className="row g-4">
             {caracteristicas.map((c, i) => (
               <div key={i} className="col-md-4">
-                <div className="card border-0 shadow-sm h-100 text-center feature-card-cony">
+                <div className="card feature-card-cony border-0 shadow-sm h-100 text-center">
                   <div className="card-body p-4">
-                    <div className="mb-3 feature-icon">{c.icono}</div>
+                    <div className="feature-icon-cony mb-3">{c.icono}</div>
                     <h4>{c.titulo}</h4>
                     <p className="text-muted">{c.descripcion}</p>
                   </div>
@@ -111,10 +83,10 @@ const Home = () => {
         <div className="container">
           <div className="text-center mb-5">
             <h2 className="display-5 fw-bold neon-glow-cony">Productos Destacados</h2>
-            <p className="lead text-muted">Los favoritos de la comunidad Cony</p>
+            <p className="lead text-muted">Los productos más populares de nuestra tienda</p>
           </div>
 
-          <div className="row g-4">
+          <div className="row g-4 featured-grid">
             {productosDestacados.map(producto => (
               <div key={producto.id} className="col-md-4">
                 <ProductoCard producto={producto} />
