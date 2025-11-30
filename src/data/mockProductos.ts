@@ -10,7 +10,7 @@ export const productos: Product[] = [
     stock: 15,
     stockCritico: 5,
     categoria: 'Periféricos',
-    imagen: 'https://m.media-amazon.com/images/I/71h45LTINwL._AC_SL1500_.jpg',
+    imagen: 'https://kronosgaming.cl/wp-content/uploads/2021/10/1-3.png',
     featured: true
   },
   {
@@ -22,7 +22,7 @@ export const productos: Product[] = [
     stock: 23,
     stockCritico: 8,
     categoria: 'Audio',
-    imagen: 'https://media.spdigital.cl/thumbnails/products/1756390473351-arcus1_d4a0bf48_e77646b7_thumbnail_512.jpg',
+    imagen: 'https://cdnx.jumpseller.com/mundotek/image/42970522/resize/753/753?1701399702',
     featured: true
   },
   {
@@ -34,7 +34,7 @@ export const productos: Product[] = [
     stock: 8,
     stockCritico: 3,
     categoria: 'Sillas',
-    imagen: 'https://m.media-amazon.com/images/I/813lzbP5UoL._AC_SL1500_.jpg',
+    imagen: 'https://media.falabella.com/falabellaCL/129757370_01/w=1200,h=1200,fit=pad',
     featured: false
   },
   {
@@ -46,7 +46,7 @@ export const productos: Product[] = [
     stock: 12,
     stockCritico: 4,
     categoria: 'Monitores',
-    imagen: 'https://http2.mlstatic.com/D_NQ_NP_2X_874805-MLA96135207215_102025-F.webp',
+    imagen: 'https://www.winpy.cl/files/w19813_lg_ultragear_27gl650f-b.jpg',
     featured: true
   },
   {
@@ -58,7 +58,7 @@ export const productos: Product[] = [
     stock: 30,
     stockCritico: 10,
     categoria: 'Consolas',
-    imagen: 'https://images.unsplash.com/photo-1687713143171-b1ffd531263d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwbGF5c3RhdGlvbiUyMGNvbnNvbGUlMjBjb250cm9sbGVyfGVufDF8fHx8MTc2MDYzODkzMnww&ixlib=rb-4.1.0&q=80&w=1080',
+    imagen: 'https://clsonyb2c.vtexassets.com/arquivos/ids/465203-1600-auto?v=638660598807800000&width=1600&height=auto&aspect=true',
     featured: false
   },
   {
