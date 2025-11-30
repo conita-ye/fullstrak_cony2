@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ShoppingCart, User, LogOut, Menu, X, Gamepad2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
@@ -8,7 +8,6 @@ interface HeaderProps {
   onNavigate: (page: string) => void;
   currentPage: string;
 }
-
 
 export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -37,7 +36,6 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
     <header className="bg-black border-b-2 border-[var(--neon-green)] sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <div
             className="flex items-center gap-2 cursor-pointer group"
             onClick={() => onNavigate('home')}
@@ -46,11 +44,10 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
               <Gamepad2 className="w-6 h-6 text-black" />
             </div>
             <span className="text-white text-xl tracking-wider">
-              ONE <span className="text-[var(--neon-green)]">TECH</span>
+              LEVEL-UP <span className="text-[var(--neon-green)]">GAMER</span>
             </span>
           </div>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             {navItems.map((item) => (
               <button
@@ -67,9 +64,7 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
             ))}
           </nav>
 
-          {/* Right Side Actions */}
           <div className="hidden md:flex items-center gap-4">
-            {/* Cart */}
             <button
               onClick={() => onNavigate('cart')}
               className="relative p-2 text-gray-300 hover:text-[var(--neon-green)] transition-colors"
@@ -82,7 +77,6 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
               )}
             </button>
 
-            {/* User Actions */}
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 <span className="text-gray-300 text-sm">
@@ -110,7 +104,6 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
             )}
           </div>
 
-          {/* Mobile Right Section (Ingresar + Hamburguesa) */}
           <div className="flex items-center gap-2 md:hidden">
             {isAuthenticated ? (
               <button
@@ -137,7 +130,6 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
             </button>
           </div>
 
-          {/* Mobile Menu */}
           {isMenuOpen && (
             <div className="md:hidden py-4 border-t border-gray-800">
               <div className="flex flex-col gap-4">
@@ -155,6 +147,7 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
                     {item.label}
                   </button>
                 ))}
+
                 <div className="border-t border-gray-800 pt-4 flex flex-col gap-3">
                   <button
                     onClick={() => {
@@ -166,6 +159,7 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
                     <ShoppingCart className="w-5 h-5" />
                     Carrito ({cartCount})
                   </button>
+
                   {isAuthenticated ? (
                     <>
                       <div className="text-gray-300 text-sm">

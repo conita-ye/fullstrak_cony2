@@ -47,12 +47,7 @@ export default function App() {
       case "home":
         return <HomePage onNavigate={handleNavigate} />;
       case "catalog":
-        return (
-          <CatalogPage
-            onNavigate={handleNavigate}
-            initialData={navigationState.data}
-          />
-        );
+        return <CatalogPage onNavigate={handleNavigate} initialData={navigationState.data} />;
       case "product-detail":
         return (
           <ProductDetailPage
@@ -69,12 +64,7 @@ export default function App() {
       case "blog":
         return <BlogPage onNavigate={handleNavigate} />;
       case "blog-detail":
-        return (
-          <BlogDetail
-            post={navigationState.data}
-            onBack={() => handleNavigate("blog")}
-          />
-        );
+        return <BlogDetail post={navigationState.data} onBack={() => handleNavigate("blog")} />;
       case "contact":
         return <ContactPage />;
       case "admin":
@@ -88,10 +78,7 @@ export default function App() {
     <AuthProvider>
       <CartProvider>
         <div className="min-h-screen flex flex-col bg-black text-white">
-          <Header
-            onNavigate={handleNavigate}
-            currentPage={navigationState.page}
-          />
+          <Header onNavigate={handleNavigate} currentPage={navigationState.page} />
           <main className="flex-1">{renderPage()}</main>
           <Footer />
           <Toaster position="top-right" theme="dark" />
