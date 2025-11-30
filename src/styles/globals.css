@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Orbitron:wght@400;500;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-black text-white;
+    font-family: 'Roboto', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+  }
+
+  h1 {
+    font-weight: 700;
+  }
+
+  h2 {
+    font-weight: 700;
+  }
+
+  h3 {
+    font-weight: 500;
+  }
+
+  p {
+    color: #D3D3D3;
+  }
+}
+
+@layer utilities {
+  .text-glow {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  }
+
+  .border-glow {
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+  }
+
+  .neon-border {
+    border: 2px solid #1E90FF;
+    box-shadow: 0 0 10px #1E90FF, inset 0 0 10px #1E90FF;
+  }
+
+  .neon-green {
+    color: #39FF14;
+    text-shadow: 0 0 10px #39FF14;
+  }
+
+  .neon-blue {
+    color: #1E90FF;
+    text-shadow: 0 0 10px #1E90FF;
+  }
+}
