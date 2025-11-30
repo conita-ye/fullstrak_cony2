@@ -149,7 +149,7 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
     const success = register(payload);
 
     if (success) {
-      toast.success('Registro exitoso. ¡Bienvenido a One Tech!');
+      toast.success('Registro exitoso. ¡Bienvenido a Level-Up Gamer!');
       onNavigate('home');
     } else {
       toast.error('El correo o RUN ya están registrados');
@@ -178,7 +178,7 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
         {/* Título */}
         <div className="text-center mb-8">
           <h1 className="text-4xl mb-2 text-[var(--neon-green)]">Crear Cuenta</h1>
-          <p className="text-gray-400">Únete a la comunidad gamer de One Tech</p>
+          <p className="text-gray-400">Únete a la comunidad gamer de Level-Up Gamer</p>
         </div>
 
         {/* Formulario */}

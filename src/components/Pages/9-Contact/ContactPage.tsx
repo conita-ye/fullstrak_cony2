@@ -20,7 +20,7 @@ export const ContactPage = () => {
 
   const handleWhatsApp = () => {
     const phoneNumber = '56912345678';
-    const message = '¡Hola! Me gustaría obtener información sobre productos One Tech.';
+    const message = '¡Hola! Me gustaría obtener información sobre productos Level-Up Gamer.';
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
   };
@@ -59,7 +59,7 @@ export const ContactPage = () => {
                 </div>
                 <div>
                   <h3 className="text-white mb-1">Email</h3>
-                  <p className="text-gray-400">contacto@onetech.cl</p>
+                  <p className="text-gray-400">contacto@levelupgamer.cl</p>
                   <p className="text-sm text-gray-500 mt-1">Respuesta en 24-48 horas</p>
                 </div>
               </div>

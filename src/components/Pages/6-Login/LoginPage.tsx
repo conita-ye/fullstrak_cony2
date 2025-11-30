@@ -59,7 +59,7 @@ export const LoginPage = ({ onNavigate }: LoginPageProps) => {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-4xl mb-2 text-[var(--neon-green)]">Iniciar Sesión</h1>
-          <p className="text-gray-400">Ingresa a tu cuenta de One Tech</p>
+          <p className="text-gray-400">Ingresa a tu cuenta de Level-Up Gamer</p>
         </div>
 
         <div className="bg-[#111] border border-[var(--neon-green)] rounded-lg p-8">

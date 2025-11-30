@@ -9,7 +9,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Sección: Información de la empresa */}
           <div>
-            <h3 className="text-[var(--neon-green)] mb-4">Sobre One Tech</h3>
+            <h3 className="text-[var(--neon-green)] mb-4">Sobre Level-Up Gamer</h3>
             <p className="text-gray-400 mb-4">
               Tienda online creada en 2022, dedicada a la comercialización de productos gamer
               de alta calidad en todo Chile.
@@ -56,7 +56,7 @@ export const Footer = () => {
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-5 h-5 text-[var(--neon-green)]" />
-                <span>contacto@onetech.cl</span>
+                <span>contacto@levelupgamer.cl</span>
               </div>
             </div>
           </div>
@@ -90,7 +90,7 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-          <p>© {new Date().getFullYear()} One Tech. Todos los derechos reservados.</p>
+          <p>© {new Date().getFullYear()} Level-Up Gamer. Todos los derechos reservados.</p>
           <p className="mt-2">
             Misión: Entregar productos gamer de alta calidad con experiencia personalizada,
             rápida y confiable.

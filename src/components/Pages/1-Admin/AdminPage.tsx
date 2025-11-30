@@ -118,7 +118,7 @@ export const AdminPage = ({ onNavigate }: AdminPageProps) => {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl mb-2 text-[var(--neon-green)]">Panel de Administración</h1>
-          <p className="text-gray-400">Gestiona productos y usuarios de One Tech</p>
+          <p className="text-gray-400">Gestiona productos y usuarios de Level-Up Gamer</p>
         </div>
 
         {/* Tabs */}

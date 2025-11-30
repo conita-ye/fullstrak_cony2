@@ -5,7 +5,7 @@ export const usuarios: User[] = [
     id: '1',
     run: '12345678',
     nombre: 'Admin',
-    apellidos: 'One Tech',
+    apellidos: 'Level-Up Gamer',
     email: 'admin@duoc.cl',
     password: 'admin123',
     fechaNacimiento: '1990-01-01',

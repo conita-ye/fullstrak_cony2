@@ -60,15 +60,15 @@ export const HomePage = ({ onNavigate }: HomePageProps) => {
         addToCart={addToCart}
       />
 
-      {/* Sobre One Tech */}
+      {/* Sobre Level-Up Gamer */}
       <section className="py-16 px-4 bg-black border-t-2 border-[var(--neon-green)]">
         <div className="max-w-4xl mx-auto text-gray-300">
           <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl mb-4 text-[var(--neon-green)]">Sobre One Tech</h2>
+            <h2 className="text-3xl md:text-4xl mb-4 text-[var(--neon-green)]">Sobre Level-Up Gamer</h2>
             <div className="w-24 h-1 bg-gradient-to-r from-[var(--neon-green)] to-[var(--neon-purple)] mx-auto mb-8"></div>
           </div>
           <p className="mb-6 text-justify leading-relaxed">
-            One Tech es una tienda online creada en 2022, dedicada a la comercialización de
+            Level-Up Gamer es una tienda online creada en 2022, dedicada a la comercialización de
             productos gamer como consolas, accesorios, sillas y computadores. Aunque no contamos
             con locales físicos, realizamos envíos a todo Chile, garantizando una experiencia de
             compra rápida y confiable.
