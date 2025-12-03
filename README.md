@@ -1,8 +1,9 @@
 # Level-Up Gamer
 
-This is a code bundle for Level-Up Gamer. The original project is available at https://www.figma.com/design/MIbjvS6YLugBYGqN3QbkQJ/One-Tech.
+
 
 ## Running the code
+cd
 
 Run `npm i` to install the dependencies.
 
