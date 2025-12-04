@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { ShoppingCart, User, LogOut, Menu, X, Search } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useCart } from '../../contexts/CartContext';
-import { Button } from '../ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
+import { Button } from '@/components/ui/button';
 interface HeaderProps {
   onNavigate: (page: string) => void;
   currentPage: string;
@@ -28,7 +28,7 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
     { label: 'Contacto', page: 'contact' },
   ];
 
-  if (user?.rol === 'admin') {
+  if (user?.rol === 'ADMINISTRADOR' || user?.rol?.toLowerCase() === 'admin') {
     navItems.push({ label: 'Admin', page: 'admin' });
   }
 
@@ -80,7 +80,7 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 <span className="text-gray-300 text-sm hidden lg:block">
-                  {user?.nombre} <span className="text-yellow-400">({user?.rol})</span>
+                  {user?.nombre} {user?.apellidos && user.apellidos} <span className="text-yellow-400">({user?.rol})</span>
                 </span>
                 <Button
                   onClick={handleLogout}
@@ -192,7 +192,7 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
                 {isAuthenticated ? (
                   <>
                     <div className="text-gray-300 text-sm pt-2">
-                      Hola, <span className='text-yellow-400'>{user?.nombre}</span> ({user?.rol})
+                      Hola, <span className='text-yellow-400'>{user?.nombre} {user?.apellidos && user.apellidos}</span> ({user?.rol})
                     </div>
                     <Button
                       onClick={() => {

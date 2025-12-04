@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { UserPlus, ArrowLeft } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Input } from '../../ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { useAuth } from '../../../contexts/AuthContext';
-import { regiones } from '../../../data/mockRegiones';
-import { validateRUN, validateEmail, validateAge, formatRUN } from '../../../utils/validations';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { UserPlus, Mail, Lock, User, Calendar, MapPin, Hash } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAuth } from '@/contexts/AuthContext';
+import { apiService } from '@/services/api';
+import { validateRUN, validateEmail, validateAge, formatRUN } from '@/utils/validations';
 import { toast } from 'sonner';
 
 type UserRole = 'admin' | 'cliente' | 'vendedor';
@@ -53,6 +53,24 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [regiones, setRegiones] = useState<Array<{ nombre: string; comunas: string[] }>>([]);
+  const [loadingRegiones, setLoadingRegiones] = useState(true);
+
+  // Cargar regiones desde el backend
+  useEffect(() => {
+    const cargarRegiones = async () => {
+      try {
+        const regionesData = await apiService.getRegiones();
+        setRegiones(regionesData);
+      } catch (error) {
+        console.error('Error al cargar regiones:', error);
+        toast.error('Error al cargar regiones');
+      } finally {
+        setLoadingRegiones(false);
+      }
+    };
+    cargarRegiones();
+  }, []);
 
   // Manejador de cambios genérico
   const handleChange = useCallback((
@@ -72,7 +90,7 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
   // Comunas dinámicas (Usamos useMemo para evitar recálculos innecesarios)
   const comunasDisponibles = useMemo(() => {
     return regiones.find((r) => r.nombre === formData.region)?.comunas || [];
-  }, [formData.region]);
+  }, [formData.region, regiones]);
   
   // Función de validación (Usamos useCallback)
   const validate = useCallback(() => {
@@ -125,7 +143,7 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
   }, [formData]); // Depende de formData
 
   // Envío del formulario
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validate()) {
@@ -135,46 +153,31 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
 
     // 1. Crear el payload sin `confirmPassword`
     // 2. Formatear el RUN antes de enviar (ej: 12.345.678-k)
-    const { confirmPassword, run, ...dataToSend } = formData;
+    const { confirmPassword, run, rol, ...dataToSend } = formData;
     
     // Aseguramos que el RUN se envíe formateado o limpio, según lo espere `register`
     // Aquí usamos `formatRUN` para consistencia visual/de almacenamiento.
     const runFormateado = formatRUN(run); 
 
-    const payload: RegisterPayload = {
+    const payload = {
         ...dataToSend,
         run: runFormateado,
+        contrasena: dataToSend.password,
     };
 
-    const success = register(payload);
+    const success = await register(payload);
 
     if (success) {
       toast.success('Registro exitoso. ¡Bienvenido a Level-Up Gamer!');
       onNavigate('home');
-    } else {
-      toast.error('El correo o RUN ya están registrados');
-      setErrors({
-         email: 'Este correo ya está registrado',
-         run: 'Este RUN ya está registrado',
-      });
     }
   };
 
   // --- Renderizado ---
 
   return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Botón volver */}
-        <Button
-          onClick={() => onNavigate('login')}
-          variant="ghost"
-          className="mb-6 text-[var(--neon-green)] hover:text-[var(--neon-purple)]"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Volver a iniciar sesión
-        </Button>
-
+    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+      <div className="max-w-2xl w-full">
         {/* Título */}
         <div className="text-center mb-8">
           <h1 className="text-4xl mb-2 text-[var(--neon-green)]">Crear Cuenta</h1>
@@ -190,81 +193,104 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
                 <label className="text-gray-300 mb-2 block">
                   RUN <span className="text-red-500">*</span>
                 </label>
-                <Input
-                  type="text"
-                  placeholder="12.345.678-K"
-                  value={formData.run}
-                  onChange={(e) => handleChange('run', e.target.value)} 
-                  onBlur={(e) => {
-                    const runLimpio = e.target.value.replace(/[^0-9kK]/g, '');
-                    if (validateRUN(runLimpio)) {
-                      setFormData(prev => ({ ...prev, run: formatRUN(runLimpio) }));
-                    } else {
-                      validate(); 
-                    }
-                  }}
-                  className="bg-[#1a1a1a] border-gray-700 text-white"
-                />
+                <div className="relative">
+                  <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Input
+                    type="text"
+                    placeholder="12.345.678-K"
+                    value={formData.run}
+                    onChange={(e) => handleChange('run', e.target.value)} 
+                    onBlur={(e) => {
+                      const runLimpio = e.target.value.replace(/[^0-9kK]/g, '');
+                      if (validateRUN(runLimpio)) {
+                        setFormData(prev => ({ ...prev, run: formatRUN(runLimpio) }));
+                      } else {
+                        validate(); 
+                      }
+                    }}
+                    className="pl-10 bg-[#1a1a1a] border-gray-700 text-white"
+                  />
+                </div>
                 {errors.run && <p className="text-red-500 text-sm mt-1">{errors.run}</p>}
               </div>
 
               {/* --- Nombre --- */}
               <div>
                 <label className="text-gray-300 mb-2 block">Nombre *</label>
-                <Input
-                  type="text"
-                  value={formData.nombre}
-                  onChange={(e) => handleChange('nombre', e.target.value)}
-                  className="bg-[#1a1a1a] border-gray-700 text-white"
-                />
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Input
+                    type="text"
+                    placeholder="Tu nombre"
+                    value={formData.nombre}
+                    onChange={(e) => handleChange('nombre', e.target.value)}
+                    className="pl-10 bg-[#1a1a1a] border-gray-700 text-white"
+                  />
+                </div>
                 {errors.nombre && <p className="text-red-500 text-sm mt-1">{errors.nombre}</p>}
               </div>
 
               {/* --- Apellidos --- */}
               <div>
                 <label className="text-gray-300 mb-2 block">Apellidos *</label>
-                <Input
-                  type="text"
-                  value={formData.apellidos}
-                  onChange={(e) => handleChange('apellidos', e.target.value)}
-                  className="bg-[#1a1a1a] border-gray-700 text-white"
-                />
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Input
+                    type="text"
+                    placeholder="Tus apellidos"
+                    value={formData.apellidos}
+                    onChange={(e) => handleChange('apellidos', e.target.value)}
+                    className="pl-10 bg-[#1a1a1a] border-gray-700 text-white"
+                  />
+                </div>
                 {errors.apellidos && <p className="text-red-500 text-sm mt-1">{errors.apellidos}</p>}
               </div>
 
               {/* --- Email --- */}
               <div>
                 <label className="text-gray-300 mb-2 block">Correo Electrónico *</label>
-                <Input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleChange('email', e.target.value)}
-                  className="bg-[#1a1a1a] border-gray-700 text-white"
-                />
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Input
+                    type="email"
+                    placeholder="tu@email.com"
+                    value={formData.email}
+                    onChange={(e) => handleChange('email', e.target.value)}
+                    className="pl-10 bg-[#1a1a1a] border-gray-700 text-white"
+                  />
+                </div>
                 {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
 
               {/* --- Password --- */}
               <div>
                 <label className="text-gray-300 mb-2 block">Contraseña *</label>
-                <Input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => handleChange('password', e.target.value)}
-                  className="bg-[#1a1a1a] border-gray-700 text-white"
-                />
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={(e) => handleChange('password', e.target.value)}
+                    className="pl-10 bg-[#1a1a1a] border-gray-700 text-white"
+                  />
+                </div>
                 {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
               </div>
 
               {/* --- Confirmar Password --- */}
               <div>
                 <label className="text-gray-300 mb-2 block">Confirmar Contraseña *</label>
-                <Input
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                  className="bg-[#1a1a1a] border-gray-700 text-white"
-                />
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                    className="pl-10 bg-[#1a1a1a] border-gray-700 text-white"
+                  />
+                </div>
                 {errors.confirmPassword && (
                   <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
                 )}
@@ -273,13 +299,16 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
               {/* --- Fecha Nacimiento --- */}
               <div>
                 <label className="text-gray-300 mb-2 block">Fecha de Nacimiento *</label>
-                <Input
-                  type="date"
-                  value={formData.fechaNacimiento}
-                  onChange={(e) => handleChange('fechaNacimiento', e.target.value)}
-                  className="bg-[#1a1a1a] border-gray-700 text-white"
-                  max={new Date().toISOString().split('T')[0]} 
-                />
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Input
+                    type="date"
+                    value={formData.fechaNacimiento}
+                    onChange={(e) => handleChange('fechaNacimiento', e.target.value)}
+                    className="pl-10 bg-[#1a1a1a] border-gray-700 text-white"
+                    max={new Date().toISOString().split('T')[0]} 
+                  />
+                </div>
                 {errors.fechaNacimiento && (
                   <p className="text-red-500 text-sm mt-1">{errors.fechaNacimiento}</p>
                 )}
@@ -288,12 +317,16 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
               {/* --- Dirección --- */}
               <div>
                 <label className="text-gray-300 mb-2 block">Dirección *</label>
-                <Input
-                  type="text"
-                  value={formData.direccion}
-                  onChange={(e) => handleChange('direccion', e.target.value)}
-                  className="bg-[#1a1a1a] border-gray-700 text-white"
-                />
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Input
+                    type="text"
+                    placeholder="Tu dirección"
+                    value={formData.direccion}
+                    onChange={(e) => handleChange('direccion', e.target.value)}
+                    className="pl-10 bg-[#1a1a1a] border-gray-700 text-white"
+                  />
+                </div>
                 {errors.direccion && <p className="text-red-500 text-sm mt-1">{errors.direccion}</p>}
               </div>
 
@@ -343,7 +376,6 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
                         </SelectItem>
                         ))
                     ) : (
-                        // Muestra un item deshabilitado si no hay región seleccionada
                         <SelectItem value="" disabled>
                             Selecciona una región primero
                         </SelectItem>
@@ -351,24 +383,6 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
                   </SelectContent>
                 </Select>
                 {errors.comuna && <p className="text-red-500 text-sm mt-1">{errors.comuna}</p>}
-              </div>
-
-              {/* --- Rol --- */}
-              <div>
-                <label className="text-gray-300 mb-2 block">Tipo de Usuario</label>
-                <Select
-                  value={formData.rol}
-                  onValueChange={(value: UserRole) => handleChange('rol', value)}
-                >
-                  <SelectTrigger className="bg-[#1a1a1a] border-gray-700 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cliente">Cliente</SelectItem>
-                    <SelectItem value="vendedor">Vendedor</SelectItem>
-                    <SelectItem value="admin">Administrador</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </div>
 

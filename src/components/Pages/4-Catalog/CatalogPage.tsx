@@ -1,25 +1,42 @@
 import React, { useState, useEffect } from 'react';
 import { Search, SlidersHorizontal } from 'lucide-react';
-import { ProductCard } from '../../Pages/3-Cart/Cart/ProductCard';
-import { Input } from '../../ui/input';
-import { Button } from '../../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { productos } from '../../../data/mockProductos';
-import { useCart } from '../../../contexts/CartContext';
+import { ProductCard } from '@/components/Pages/3-Cart/Cart/ProductCard';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { apiService } from '@/services/api';
+import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
 
+interface Product {
+  id: number;
+  codigo: string;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  stock: number;
+  stockCritico?: number;
+  categoria: string;
+  imagenes: string[];
+  puntosLevelUp?: number;
+}
 
 interface CatalogPageProps {
   onNavigate: (page: string, data?: any) => void;
   initialData?: { categoria?: string };
 }
 
-
 export const CatalogPage = ({ onNavigate, initialData }: CatalogPageProps) => {
   const { addToCart } = useCart();
+  const [productos, setProductos] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
+
+  useEffect(() => {
+    cargarProductos();
+  }, []);
 
   useEffect(() => {
     if (initialData?.categoria) {
@@ -27,23 +44,42 @@ export const CatalogPage = ({ onNavigate, initialData }: CatalogPageProps) => {
     }
   }, [initialData]);
 
-  const categories = ['all', ...Array.from(new Set(productos.map((p) => p.categoria)))];
-
-  const handleAddToCart = (productId: string) => {
-    addToCart(productId, 1);
-    toast.success('Producto agregado al carrito');
+  const cargarProductos = async () => {
+    try {
+      setLoading(true);
+      const productosData = await apiService.getProductos();
+      setProductos(productosData);
+    } catch (error) {
+      console.error('Error al cargar productos:', error);
+      toast.error('Error al cargar el catálogo');
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const getCategoriaNombre = (categoria: any): string => {
+    if (typeof categoria === 'string') return categoria;
+    if (categoria && typeof categoria === 'object') {
+      return categoria.nombre || categoria.codigo || 'Sin categoría';
+    }
+    return 'Sin categoría';
+  };
+
+  const categories = ['all', ...Array.from(new Set(productos.map((p) => getCategoriaNombre(p.categoria))))];
+
+  const handleAddToCart = async (productId: number) => {
+    await addToCart(productId, 1);
+  };
 
   let filteredProducts = productos.filter((product) => {
     const matchesSearch =
       product.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.descripcion.toLowerCase().includes(searchTerm.toLowerCase());
+    const categoriaNombre = getCategoriaNombre(product.categoria);
     const matchesCategory =
-      selectedCategory === 'all' || product.categoria === selectedCategory;
+      selectedCategory === 'all' || categoriaNombre === selectedCategory;
     return matchesSearch && matchesCategory;
   });
-
 
   filteredProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
@@ -55,7 +91,7 @@ export const CatalogPage = ({ onNavigate, initialData }: CatalogPageProps) => {
         return a.nombre.localeCompare(b.nombre);
       case 'featured':
       default:
-        return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+        return (b.puntosLevelUp || 0) - (a.puntosLevelUp || 0);
     }
   });
 
@@ -144,16 +180,37 @@ export const CatalogPage = ({ onNavigate, initialData }: CatalogPageProps) => {
         </div>
 
         {/* Grid de productos */}
-        {filteredProducts.length > 0 ? (
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400">Cargando productos...</p>
+          </div>
+        ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
+            {filteredProducts.map((product) => {
+              const categoriaNombre = typeof product.categoria === 'string' 
+                ? product.categoria 
+                : (product.categoria?.nombre || product.categoria?.codigo || 'Sin categoría');
+              
+              return (
+                <ProductCard
+                  key={product.id}
+                  product={{
+                    id: String(product.id),
+                    codigo: product.codigo,
+                    nombre: product.nombre,
+                    descripcion: product.descripcion,
+                    precio: product.precio,
+                    stock: product.stock,
+                    stockCritico: product.stockCritico,
+                    categoria: categoriaNombre,
+                    imagen: product.imagenes && product.imagenes.length > 0 ? product.imagenes[0] : '',
+                    featured: (product.puntosLevelUp || 0) >= 500
+                  }}
                 onAddToCart={handleAddToCart}
                 onViewDetails={(id) => onNavigate('product-detail', { productId: id })}
               />
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-16">

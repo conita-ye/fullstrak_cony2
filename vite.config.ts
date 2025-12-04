@@ -59,15 +59,14 @@
     server: {
       port: 5173,
       open: true,
-    proxy: {
-      // redirige /api/* al backend en 8085 en desarrollo
-      '/api': {
-        target: 'http://localhost:8085',
-        changeOrigin: true,
-        secure: false,
-         rewrite: (path) => path, // mantiene la ruta /api/v1/...
+      proxy: {
+        '/api': {
+          target: 'http://localhost:8081',
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path,
+        },
       },
-    },
     },
   });
 

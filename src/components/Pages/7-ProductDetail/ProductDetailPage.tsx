@@ -1,15 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Star, AlertCircle, ArrowLeft, Package } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Badge } from '../../ui/badge';
-import { Input } from '../../ui/input';
-import { Textarea } from '../../ui/textarea';
-import { productos } from '../../../data/mockProductos';
-import {reviews as allReviews} from '../../../data/mockResenia';
-import { useCart } from '../../../contexts/CartContext';
-import { useAuth } from '../../../contexts/AuthContext';
-import { formatPrice } from '../../../utils/validations';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { apiService } from '@/services/api';
+import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { formatPrice } from '@/utils/validations';
 import { toast } from 'sonner';
+
+interface Product {
+  id: number;
+  codigo: string;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  stock: number;
+  stockCritico?: number;
+  categoria: string | { id?: number; codigo?: string; nombre?: string; descripcion?: string; activo?: boolean };
+  imagenes: string[];
+  puntosLevelUp?: number;
+}
+
+interface Review {
+  id: number;
+  calificacion: number;
+  texto: string;
+  fechaCreacion: string;
+  usuarioNombre?: string;
+}
 
 interface ProductDetailPageProps {
   productId: string;
@@ -19,11 +39,46 @@ interface ProductDetailPageProps {
 export const ProductDetailPage = ({ productId, onNavigate }: ProductDetailPageProps) => {
   const { addToCart } = useCart();
   const { user, isAuthenticated } = useAuth();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [newReview, setNewReview] = useState({ calificacion: 5, comentario: '' });
 
-  const product = productos.find((p) => p.id === productId);
-  const productReviews = allReviews.filter((r) => r.productId === productId);
+  useEffect(() => {
+    cargarProducto();
+    cargarResenas();
+  }, [productId]);
+
+  const cargarProducto = async () => {
+    try {
+      setLoading(true);
+      const productoData = await apiService.getProducto(productId);
+      setProduct(productoData);
+    } catch (error) {
+      console.error('Error al cargar producto:', error);
+      toast.error('Error al cargar el producto');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cargarResenas = async () => {
+    try {
+      const resenasData = await apiService.getResenas(productId);
+      setReviews(resenasData);
+    } catch (error) {
+      console.error('Error al cargar reseñas:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-400">Cargando producto...</p>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -44,21 +99,31 @@ export const ProductDetailPage = ({ productId, onNavigate }: ProductDetailPagePr
   const isLowStock = product.stockCritico && product.stock <= product.stockCritico;
   const isOutOfStock = product.stock === 0;
   const avgRating =
-    productReviews.length > 0
-      ? productReviews.reduce((sum, r) => sum + r.calificacion, 0) / productReviews.length
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.calificacion, 0) / reviews.length
       : 0;
 
-  const handleAddToCart = () => {
+  // Helper para obtener el nombre de la categoría
+  const getCategoriaNombre = (categoria: string | { nombre?: string; codigo?: string }): string => {
+    if (typeof categoria === 'string') return categoria;
+    if (categoria && typeof categoria === 'object') {
+      return categoria.nombre || categoria.codigo || 'Sin categoría';
+    }
+    return 'Sin categoría';
+  };
+
+  const categoriaNombre = getCategoriaNombre(product.categoria);
+
+  const handleAddToCart = async () => {
     if (quantity > product.stock) {
       toast.error('Cantidad no disponible en stock');
       return;
     }
-    addToCart(product.id, quantity);
-    toast.success(`${quantity} unidad(es) agregada(s) al carrito`);
+    await addToCart(product.id, quantity);
   };
 
-  const handleSubmitReview = () => {
-    if (!isAuthenticated) {
+  const handleSubmitReview = async () => {
+    if (!isAuthenticated || !user) {
       toast.error('Debes iniciar sesión para dejar una reseña');
       return;
     }
@@ -67,8 +132,19 @@ export const ProductDetailPage = ({ productId, onNavigate }: ProductDetailPagePr
       return;
     }
 
-    toast.success('Reseña enviada correctamente');
-    setNewReview({ calificacion: 5, comentario: '' });
+    try {
+      await apiService.crearResena({
+        productoId: product.id,
+        texto: newReview.comentario,
+        calificacion: newReview.calificacion
+      });
+      toast.success('Reseña enviada correctamente');
+      setNewReview({ calificacion: 5, comentario: '' });
+      await cargarResenas();
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || 'Error al enviar la reseña';
+      toast.error(errorMessage);
+    }
   };
 
   return (
@@ -89,11 +165,11 @@ export const ProductDetailPage = ({ productId, onNavigate }: ProductDetailPagePr
           {/* Imagen */}
           <div className="relative">
             <img
-              src={product.imagen}
+              src={product.imagenes && product.imagenes.length > 0 ? product.imagenes[0] : ''}
               alt={product.nombre}
               className="w-full rounded-lg border-2 border-[var(--neon-green)]"
             />
-            {product.featured && (
+            {(product.puntosLevelUp || 0) >= 500 && (
               <Badge className="absolute top-4 right-4 bg-[var(--neon-purple)] text-white border-0">
                 Destacado
               </Badge>
@@ -103,7 +179,7 @@ export const ProductDetailPage = ({ productId, onNavigate }: ProductDetailPagePr
           {/* Información */}
           <div>
             <Badge className="mb-4 bg-black border-[var(--neon-green)] text-[var(--neon-green)]">
-              {product.categoria}
+              {categoriaNombre}
             </Badge>
 
             <h1 className="text-4xl mb-4 text-white">{product.nombre}</h1>
@@ -124,7 +200,7 @@ export const ProductDetailPage = ({ productId, onNavigate }: ProductDetailPagePr
                   ))}
                 </div>
                 <span className="text-[var(--neon-green)]">
-                  {avgRating.toFixed(1)} ({productReviews.length} reseñas)
+                  {avgRating.toFixed(1)} ({reviews.length} reseñas)
                 </span>
               </div>
             )}
@@ -241,16 +317,18 @@ export const ProductDetailPage = ({ productId, onNavigate }: ProductDetailPagePr
 
           {/* Listado de reseñas */}
           <div className="space-y-6">
-            {productReviews.length > 0 ? (
-              productReviews.map((review) => (
+            {reviews.length > 0 ? (
+              reviews.map((review) => (
                 <div
                   key={review.id}
                   className="bg-[#111] border border-gray-800 rounded-lg p-6"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <div className="text-white mb-1">{review.userName}</div>
-                      <div className="text-sm text-gray-500">{review.fecha}</div>
+                      <div className="text-white mb-1">{review.usuarioNombre || 'Usuario'}</div>
+                      <div className="text-sm text-gray-500">
+                        {new Date(review.fechaCreacion).toLocaleDateString('es-CL')}
+                      </div>
                     </div>
                     <div className="flex gap-1">
                       {[...Array(5)].map((_, i) => (
@@ -265,7 +343,7 @@ export const ProductDetailPage = ({ productId, onNavigate }: ProductDetailPagePr
                       ))}
                     </div>
                   </div>
-                  <p className="text-gray-300">{review.comentario}</p>
+                  <p className="text-gray-300">{review.texto}</p>
                 </div>
               ))
             ) : (

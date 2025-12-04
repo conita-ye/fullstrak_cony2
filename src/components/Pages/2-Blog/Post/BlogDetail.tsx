@@ -1,6 +1,19 @@
+import { useState, useEffect } from "react";
 import { Calendar, User } from "lucide-react";
-import { Button } from "../../../ui/button";
-import type { BlogPost } from "../Interface/blog";
+import { Button } from "@/components/ui/button";
+import { apiService } from "@/services/api";
+import { toast } from "sonner";
+
+interface BlogPost {
+  id: number;
+  titulo: string;
+  descripcionCorta: string;
+  autor: string;
+  fechaPublicacion: string;
+  imagenUrl: string;
+  contenidoUrl?: string;
+  contenido?: string;
+}
 
 interface BlogDetailProps {
   post: BlogPost;
@@ -8,6 +21,26 @@ interface BlogDetailProps {
 }
 
 export const BlogDetail = ({ post, onBack }: BlogDetailProps) => {
+  const [contenido, setContenido] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    cargarContenido();
+  }, [post.id]);
+
+  const cargarContenido = async () => {
+    try {
+      setLoading(true);
+      const blogCompleto = await apiService.getBlogPost(String(post.id));
+      setContenido(blogCompleto.contenido || blogCompleto.descripcionCorta || '');
+    } catch (error) {
+      console.error('Error al cargar contenido del blog:', error);
+      setContenido(post.descripcionCorta || '');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="max-w-4xl mx-auto py-10 px-4 text-white">
       <Button
@@ -19,7 +52,7 @@ export const BlogDetail = ({ post, onBack }: BlogDetailProps) => {
       </Button>
 
       <img
-        src={post.imagen}
+        src={post.imagenUrl || 'https://picsum.photos/1200/600'}
         alt={post.titulo}
         className="rounded-lg mb-6 w-full"
       />
@@ -31,11 +64,17 @@ export const BlogDetail = ({ post, onBack }: BlogDetailProps) => {
         </div>
         <div className="flex items-center gap-1">
           <Calendar className="w-4 h-4" />{" "}
-          {new Date(post.fecha).toLocaleDateString("es-CL")}
+          {new Date(post.fechaPublicacion).toLocaleDateString("es-CL")}
         </div>
       </div>
 
-      <p className="text-gray-300 leading-relaxed">{post.contenido}</p>
+      {loading ? (
+        <p className="text-gray-400">Cargando contenido...</p>
+      ) : (
+        <div className="text-gray-300 leading-relaxed whitespace-pre-line">
+          {contenido}
+        </div>
+      )}
     </div>
   );
 };

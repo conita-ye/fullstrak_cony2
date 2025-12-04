@@ -1,6 +1,7 @@
 import { Toaster } from "./components/ui/sonner";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
+import { NavigationProvider } from "./contexts/NavigationContext";
 import { Header } from "./components/Layout/Header";
 import { Footer } from "./components/Layout/Footer";
 import { HomePage } from "./components/Pages/5-Home/HomePage";
@@ -12,7 +13,7 @@ import { RegisterPage } from "./components/Pages/8-Register/RegisterPage";
 import { BlogPage } from "./components/Pages/2-Blog/BlogPage";
 import { ContactPage } from "./components/Pages/9-Contact/ContactPage";
 import { AdminPage } from "./components/Pages/1-Admin/AdminPage";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BlogDetail } from "./components/Pages/2-Blog/Post/BlogDetail";
 
 type PageType =
@@ -41,6 +42,20 @@ export default function App() {
     setNavigationState({ page: page as PageType, data });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  // Escuchar eventos de navegación desde el apiService
+  useEffect(() => {
+    const handleNavigationEvent = (event: CustomEvent) => {
+      const { page, data } = event.detail;
+      handleNavigate(page, data);
+    };
+
+    window.addEventListener('navigate', handleNavigationEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('navigate', handleNavigationEvent as EventListener);
+    };
+  }, []);
 
   const renderPage = () => {
     switch (navigationState.page) {
@@ -77,12 +92,14 @@ export default function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <div className="min-h-screen flex flex-col bg-black text-white">
-          <Header onNavigate={handleNavigate} currentPage={navigationState.page} />
-          <main className="flex-1">{renderPage()}</main>
-          <Footer />
-          <Toaster position="top-right" theme="dark" />
-        </div>
+        <NavigationProvider navigate={handleNavigate}>
+          <div className="min-h-screen flex flex-col bg-black text-white">
+            <Header onNavigate={handleNavigate} currentPage={navigationState.page} />
+            <main className="flex-1">{renderPage()}</main>
+            <Footer />
+            <Toaster position="top-right" theme="dark" />
+          </div>
+        </NavigationProvider>
       </CartProvider>
     </AuthProvider>
   );

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Mail, Lock, LogIn, UserPlus } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Input } from '../../ui/input';
-import { useAuth } from '../../../contexts/AuthContext';
-import { validateEmail } from '../../../utils/validations';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useAuth } from '@/contexts/AuthContext';
+import { validateEmail } from '@/utils/validations';
 import { toast } from 'sonner';
 
 interface LoginPageProps {
@@ -38,18 +38,17 @@ export const LoginPage = ({ onNavigate }: LoginPageProps) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validate()) return;
 
-    const success = login(formData.email, formData.password);
+    const success = await login(formData.email, formData.password);
 
     if (success) {
       toast.success('Sesión iniciada correctamente');
       onNavigate('home');
     } else {
-      toast.error('Credenciales incorrectas');
       setErrors({ password: 'Usuario o contraseña incorrectos' });
     }
   };
@@ -113,23 +112,39 @@ export const LoginPage = ({ onNavigate }: LoginPageProps) => {
               </button>
             </div>
 
-            {/* Botón submit */}
-            <Button
-              type="submit"
-              className="w-full bg-[var(--neon-green)] text-black hover:bg-[var(--neon-purple)] hover:text-white"
-            >
-              <LogIn className="w-5 h-5 mr-2" />
-              Iniciar Sesión
-            </Button>
+            {/* Botones */}
+            <div className="space-y-4">
+              <Button
+                type="submit"
+                className="w-full bg-[var(--neon-green)] text-black hover:bg-[var(--neon-purple)] hover:text-white"
+              >
+                <LogIn className="w-5 h-5 mr-2" />
+                Iniciar Sesión
+              </Button>
+
+              <Button
+                type="button"
+                onClick={() => onNavigate('register')}
+                variant="outline"
+                className="w-full border-2 border-[var(--neon-purple)] !text-[var(--neon-purple)] !bg-transparent hover:!bg-[var(--neon-purple)] hover:!text-white transition-colors"
+              >
+                <UserPlus className="w-5 h-5 mr-2" />
+                Registrarse
+              </Button>
+            </div>
           </form>
 
-          {/* Link a registro */}
+          {/* Link a registro (alternativo) */}
           <div className="mt-6 text-center">
             <p className="text-gray-400">
               ¿No tienes cuenta?{' '}
               <button
-                onClick={() => onNavigate('register')}
-                className="text-[var(--neon-green)] hover:text-[var(--neon-purple)] transition-colors"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onNavigate('register');
+                }}
+                className="text-[var(--neon-green)] hover:text-[var(--neon-purple)] transition-colors font-semibold underline"
               >
                 Regístrate aquí
               </button>

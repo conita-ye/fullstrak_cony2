@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Input } from '../../ui/input';
-import { useCart } from '../../../contexts/CartContext';
-import { useAuth } from '../../../contexts/AuthContext';
-import { formatPrice } from '../../../utils/validations';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useCart } from '@/contexts/CartContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { formatPrice } from '@/utils/validations';
 import { toast } from 'sonner';
 
 interface CartPageProps {
@@ -12,13 +12,23 @@ interface CartPageProps {
 }
 
 export const CartPage = ({ onNavigate }: CartPageProps) => {
-  const { cart, removeFromCart, updateQuantity, getCartTotal, getProductById, clearCart } = useCart();
+  const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart, loading } = useCart();
   const { isAuthenticated } = useAuth();
   const [codigoReferido, setCodigoReferido] = useState('');
   const [descuento, setDescuento] = useState(0);
 
   const subtotal = getCartTotal();
   const total = subtotal - descuento;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-400">Cargando carrito...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleApplyCode = () => {
     if (codigoReferido.toUpperCase() === 'GAMER2024') {
@@ -34,7 +44,7 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (!isAuthenticated) {
       toast.error('Debes iniciar sesión para continuar');
       onNavigate('login');
@@ -47,7 +57,7 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
     }
 
     toast.success('Pedido procesado correctamente (simulado)');
-    clearCart();
+    await clearCart();
     setCodigoReferido('');
     setDescuento(0);
     onNavigate('home');
@@ -81,76 +91,62 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Lista de productos */}
           <div className="lg:col-span-2 space-y-4">
-            {cart.map((item) => {
-              const product = getProductById(item.productId);
-              if (!product) return null;
-
-              return (
-                <div
-                  key={item.productId}
-                  className="bg-[#111] border border-[var(--neon-green)] rounded-lg p-4 flex gap-4"
-                >
-                  <img
-                    src={product.imagen}
-                    alt={product.nombre}
-                    className="w-24 h-24 object-cover rounded-lg"
-                  />
-
-                  <div className="flex-1">
-                    <h3
-                      className="text-white mb-2 cursor-pointer hover:text-[var(--neon-green)] transition-colors"
-                      onClick={() => onNavigate('product-detail', { productId: product.id })}
-                    >
-                      {product.nombre}
-                    </h3>
-                    <p className="text-gray-400 text-sm mb-2">{product.categoria}</p>
-                    <div className="text-[var(--neon-green)] text-xl">
-                      {formatPrice(product.precio)}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-end justify-between">
-                    {/* Controles de cantidad */}
-                    <div className="flex items-center gap-2 bg-[#1a1a1a] rounded-lg">
-                      <button
-                        onClick={() => updateQuantity(item.productId, item.cantidad - 1)}
-                        className="p-2 text-gray-400 hover:text-[var(--neon-green)] transition-colors"
-                        disabled={item.cantidad <= 1}
-                      >
-                        <Minus className="w-4 h-4" />
-                      </button>
-                      <span className="text-white min-w-[2rem] text-center">
-                        {item.cantidad}
-                      </span>
-                      <button
-                        onClick={() => updateQuantity(item.productId, item.cantidad + 1)}
-                        className="p-2 text-gray-400 hover:text-[var(--neon-green)] transition-colors"
-                        disabled={item.cantidad >= product.stock}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    {/* Subtotal y eliminar */}
-                    <div className="text-right">
-                      <div className="text-white mb-2">
-                        Subtotal: {formatPrice(product.precio * item.cantidad)}
-                      </div>
-                      <button
-                        onClick={() => {
-                          removeFromCart(item.productId);
-                          toast.success('Producto eliminado del carrito');
-                        }}
-                        className="text-red-500 hover:text-red-400 transition-colors flex items-center gap-1"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Eliminar
-                      </button>
-                    </div>
+            {cart.map((item) => (
+              <div
+                key={item.productId}
+                className="bg-[#111] border border-[var(--neon-green)] rounded-lg p-4 flex gap-4"
+              >
+                <div className="flex-1">
+                  <h3
+                    className="text-white mb-2 cursor-pointer hover:text-[var(--neon-green)] transition-colors"
+                    onClick={() => onNavigate('product-detail', { productId: String(item.productId) })}
+                  >
+                    {item.productName}
+                  </h3>
+                  <div className="text-[var(--neon-green)] text-xl mb-2">
+                    {formatPrice(item.price)}
                   </div>
                 </div>
-              );
-            })}
+
+                <div className="flex flex-col items-end justify-between">
+                  {/* Controles de cantidad */}
+                  <div className="flex items-center gap-2 bg-[#1a1a1a] rounded-lg">
+                    <button
+                      onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                      className="p-2 text-gray-400 hover:text-[var(--neon-green)] transition-colors"
+                      disabled={item.quantity <= 1}
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="text-white min-w-[2rem] text-center">
+                      {item.quantity}
+                    </span>
+                    <button
+                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                      className="p-2 text-gray-400 hover:text-[var(--neon-green)] transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Subtotal y eliminar */}
+                  <div className="text-right">
+                    <div className="text-white mb-2">
+                      Subtotal: {formatPrice(item.subtotal)}
+                    </div>
+                    <button
+                      onClick={async () => {
+                        await removeFromCart(item.productId);
+                      }}
+                      className="text-red-500 hover:text-red-400 transition-colors flex items-center gap-1"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Resumen del pedido */}

@@ -1,21 +1,110 @@
-import { productos } from '../../../data/mockProductos';
-import { useCart } from '../../../contexts/CartContext';
+import { useState, useEffect } from 'react';
+import { apiService } from '@/services/api';
+import { useCart } from '@/contexts/CartContext';
 import HomeCarousel from './HomeComponents/Carrusel';
 import Beneficios from './HomeComponents/Beneficios';
 import ProductosDestacados from './HomeComponents/ProductosDestacados';
 import SeccionCategoria from './HomeComponents/SeccionCategoria';
 import type { HomePageProps } from './Interface/HomePageProps';
 
+interface Product {
+  id: number;
+  codigo: string;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  stock: number;
+  categoria: string;
+  imagenes: string[];
+  puntosLevelUp?: number;
+}
+
 export const HomePage = ({ onNavigate }: HomePageProps) => {
   const { addToCart } = useCart();
+  const [productos, setProductos] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Filtra productos destacados
-  const featuredProducts = productos.filter((p) => p.featured);
+  useEffect(() => {
+    cargarProductos();
+  }, []);
+
+  const cargarProductos = async () => {
+    try {
+      const productosData = await apiService.getProductos();
+      setProductos(productosData);
+    } catch (error) {
+      console.error('Error al cargar productos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper para obtener el nombre de la categoría
+  const getCategoriaNombre = (categoria: any): string => {
+    if (typeof categoria === 'string') return categoria;
+    if (categoria && typeof categoria === 'object') {
+      return categoria.nombre || categoria.codigo || 'Sin categoría';
+    }
+    return 'Sin categoría';
+  };
+
+  // Filtra productos destacados (puntosLevelUp >= 500)
+  const featuredProducts = productos
+    .filter((p) => (p.puntosLevelUp || 0) >= 500)
+    .map(p => ({
+      id: String(p.id),
+      codigo: p.codigo,
+      nombre: p.nombre,
+      descripcion: p.descripcion,
+      precio: p.precio,
+      stock: p.stock,
+      categoria: getCategoriaNombre(p.categoria),
+      imagen: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : '',
+      featured: true
+    }));
 
   // Filtra productos por categorías
-  const computadores = productos.filter((p) => p.categoria === 'Computadores');
-  const perifericos = productos.filter((p) => p.categoria === 'Periféricos');
-  const monitores = productos.filter((p) => p.categoria === 'Monitores');
+  const computadores = productos
+    .filter((p) => getCategoriaNombre(p.categoria) === 'Computadores Gamers')
+    .map(p => ({
+      id: String(p.id),
+      codigo: p.codigo,
+      nombre: p.nombre,
+      descripcion: p.descripcion,
+      precio: p.precio,
+      stock: p.stock,
+      categoria: getCategoriaNombre(p.categoria),
+      imagen: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : '',
+      featured: false
+    }));
+  
+  const perifericos = productos
+    .filter((p) => getCategoriaNombre(p.categoria) === 'Periféricos')
+    .map(p => ({
+      id: String(p.id),
+      codigo: p.codigo,
+      nombre: p.nombre,
+      descripcion: p.descripcion,
+      precio: p.precio,
+      stock: p.stock,
+      categoria: getCategoriaNombre(p.categoria),
+      imagen: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : '',
+      featured: false
+    }));
+  
+  const monitores = productos
+    .filter((p) => getCategoriaNombre(p.categoria) === 'Monitores')
+    .map(p => ({
+      id: String(p.id),
+      codigo: p.codigo,
+      nombre: p.nombre,
+      descripcion: p.descripcion,
+      precio: p.precio,
+      stock: p.stock,
+      categoria: getCategoriaNombre(p.categoria),
+      imagen: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : '',
+      featured: false
+    }));
 
   return (
     <div className="min-h-screen">

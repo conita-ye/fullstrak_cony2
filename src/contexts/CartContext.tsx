@@ -1,86 +1,165 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { CartItem, Product } from '../types';
-import { productos } from '../data/mockProductos';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { apiService } from '@/services/api';
+import { useAuth } from './AuthContext';
+import { toast } from 'sonner';
+
+interface CartItem {
+  productId: number;
+  productName: string;
+  quantity: number;
+  price: number;
+  subtotal: number;
+}
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (productId: string, cantidad: number) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, cantidad: number) => void;
-  clearCart: () => void;
+  loading: boolean;
+  addToCart: (productId: number, cantidad: number) => Promise<void>;
+  removeFromCart: (productId: number) => Promise<void>;
+  updateQuantity: (productId: number, cantidad: number) => Promise<void>;
+  clearCart: () => Promise<void>;
   getCartTotal: () => number;
   getCartItemsCount: () => number;
-  getProductById: (productId: string) => Product | undefined;
+  refreshCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
+  const { user, isAuthenticated } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const addToCart = (productId: string, cantidad: number) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.productId === productId);
-      
-      if (existingItem) {
-        return prevCart.map((item) =>
-          item.productId === productId
-            ? { ...item, cantidad: item.cantidad + cantidad }
-            : item
-        );
-      }
-      
-      return [...prevCart, { productId, cantidad }];
-    });
-  };
-
-  const removeFromCart = (productId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.productId !== productId));
-  };
-
-  const updateQuantity = (productId: string, cantidad: number) => {
-    if (cantidad <= 0) {
-      removeFromCart(productId);
+  const loadCart = async () => {
+    if (!isAuthenticated || !user) {
+      setCart([]);
       return;
     }
-    
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.productId === productId ? { ...item, cantidad } : item
-      )
-    );
+
+    try {
+      setLoading(true);
+      const cartData = await apiService.getCarrito(user.id);
+      setCart(cartData.items || []);
+    } catch (error: any) {
+      console.error('Error al cargar carrito:', error);
+      if (error.response?.status !== 404) {
+        toast.error('Error al cargar el carrito');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const clearCart = () => {
-    setCart([]);
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      loadCart();
+    } else {
+      setCart([]);
+    }
+  }, [isAuthenticated, user?.id]);
+
+  const addToCart = async (productId: number, cantidad: number) => {
+    if (!isAuthenticated || !user) {
+      toast.error('Debes iniciar sesión para agregar productos al carrito');
+      return;
+    }
+
+    try {
+      await apiService.addToCart(user.id, productId, cantidad);
+      await loadCart();
+      toast.success('Producto agregado al carrito');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || 'Error al agregar producto al carrito';
+      toast.error(errorMessage);
+    }
   };
 
-  const getProductById = (productId: string): Product | undefined => {
-    return productos.find((p) => p.id === productId);
+  const removeFromCart = async (productId: number) => {
+    if (!isAuthenticated || !user) {
+      return;
+    }
+
+    try {
+      await apiService.removeFromCart(user.id, productId);
+      await loadCart();
+      toast.success('Producto eliminado del carrito');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || 'Error al eliminar producto del carrito';
+      toast.error(errorMessage);
+    }
+  };
+
+  const updateQuantity = async (productId: number, cantidad: number) => {
+    if (cantidad <= 0) {
+      await removeFromCart(productId);
+      return;
+    }
+
+    if (!isAuthenticated || !user) {
+      return;
+    }
+
+    try {
+      const currentItem = cart.find((item) => item.productId === productId);
+      if (!currentItem) {
+        return;
+      }
+
+      const difference = cantidad - currentItem.quantity;
+      if (difference > 0) {
+        await apiService.addToCart(user.id, productId, difference);
+      } else {
+        await apiService.removeFromCart(user.id, productId);
+        if (cantidad > 0) {
+          await apiService.addToCart(user.id, productId, cantidad);
+        }
+      }
+      await loadCart();
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || 'Error al actualizar cantidad';
+      toast.error(errorMessage);
+    }
+  };
+
+  const clearCart = async () => {
+    if (!isAuthenticated || !user) {
+      return;
+    }
+
+    try {
+      await apiService.clearCart(user.id);
+      await loadCart();
+      toast.success('Carrito vaciado');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || 'Error al vaciar el carrito';
+      toast.error(errorMessage);
+    }
   };
 
   const getCartTotal = (): number => {
-    return cart.reduce((total, item) => {
-      const product = getProductById(item.productId);
-      return total + (product?.precio || 0) * item.cantidad;
-    }, 0);
+    return cart.reduce((total, item) => total + item.subtotal, 0);
   };
 
   const getCartItemsCount = (): number => {
-    return cart.reduce((count, item) => count + item.cantidad, 0);
+    return cart.reduce((count, item) => count + item.quantity, 0);
+  };
+
+  const refreshCart = async () => {
+    await loadCart();
   };
 
   return (
     <CartContext.Provider
       value={{
         cart,
+        loading,
         addToCart,
         removeFromCart,
         updateQuantity,
         clearCart,
         getCartTotal,
         getCartItemsCount,
-        getProductById,
+        refreshCart,
       }}
     >
       {children}

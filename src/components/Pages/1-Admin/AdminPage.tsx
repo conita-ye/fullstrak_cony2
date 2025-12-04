@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Package, Users, ShoppingCart, TrendingUp, Plus, Edit, Trash2 } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Input } from '../../ui/input';
-import { Textarea } from '../../ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
-import { useAuth } from '../../../contexts/AuthContext';
-import { productos as initialProductos } from '../../../data/mockProductos';
-import { Product } from '../../../types';
-import { formatPrice, validateProductCode, validatePrice, validateStock } from '../../../utils/validations';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAuth } from '@/contexts/AuthContext';
+import { apiService } from '@/services/api';
+import { Product } from '@/types';
+import { formatPrice, validateProductCode, validatePrice, validateStock } from '@/utils/validations';
 import { toast } from 'sonner';
 
 interface AdminPageProps {
@@ -17,7 +17,38 @@ interface AdminPageProps {
 export const AdminPage = ({ onNavigate }: AdminPageProps) => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'users'>('dashboard');
-  const [productos, setProductos] = useState(initialProductos);
+  const [productos, setProductos] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user?.rol === 'admin' || user?.rol === 'ADMINISTRADOR') {
+      cargarProductos();
+    }
+  }, [user]);
+
+  const cargarProductos = async () => {
+    try {
+      setLoading(true);
+      const productosData = await apiService.getProductos();
+      setProductos(productosData.map(p => ({
+        id: String(p.id),
+        codigo: p.codigo,
+        nombre: p.nombre,
+        descripcion: p.descripcion,
+        precio: p.precio,
+        stock: p.stock,
+        stockCritico: p.stockCritico,
+        categoria: p.categoria,
+        imagen: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : '',
+        featured: (p.puntosLevelUp || 0) >= 500
+      })));
+    } catch (error) {
+      console.error('Error al cargar productos:', error);
+      toast.error('Error al cargar productos');
+    } finally {
+      setLoading(false);
+    }
+  };
   const [isCreating, setIsCreating] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [newProduct, setNewProduct] = useState<Partial<Product>>({
@@ -32,7 +63,7 @@ export const AdminPage = ({ onNavigate }: AdminPageProps) => {
     featured: false,
   });
 
-  if (user?.rol !== 'admin') {
+  if (user?.rol !== 'admin' && user?.rol !== 'ADMINISTRADOR') {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -51,7 +82,7 @@ export const AdminPage = ({ onNavigate }: AdminPageProps) => {
     );
   }
 
-  const handleSaveProduct = () => {
+  const handleSaveProduct = async () => {
     if (!newProduct.codigo || !newProduct.nombre || !newProduct.descripcion) {
       toast.error('Por favor completa todos los campos obligatorios');
       return;
@@ -72,39 +103,65 @@ export const AdminPage = ({ onNavigate }: AdminPageProps) => {
       return;
     }
 
-    if (editingProduct) {
-      // Editar producto existente
-      setProductos(
-        productos.map((p) =>
-          p.id === editingProduct.id ? { ...p, ...newProduct } as Product : p
-        )
-      );
-      toast.success('Producto actualizado correctamente');
-    } else {
-      // Crear nuevo producto
-      const newId = String(Math.max(...productos.map((p) => parseInt(p.id))) + 1);
-      setProductos([...productos, { ...newProduct, id: newId } as Product]);
-      toast.success('Producto creado correctamente');
-    }
+    try {
+      if (editingProduct) {
+        // Editar producto existente
+        await apiService.updateProducto(Number(editingProduct.id), {
+          codigo: newProduct.codigo,
+          nombre: newProduct.nombre,
+          descripcion: newProduct.descripcion,
+          precio: newProduct.precio,
+          stock: newProduct.stock,
+          stockCritico: newProduct.stockCritico,
+          categoria: newProduct.categoria,
+        });
+        toast.success('Producto actualizado correctamente');
+      } else {
+        // Crear nuevo producto
+        await apiService.createProducto({
+          codigo: newProduct.codigo!,
+          nombre: newProduct.nombre!,
+          descripcion: newProduct.descripcion!,
+          precio: newProduct.precio!,
+          stock: newProduct.stock!,
+          stockCritico: newProduct.stockCritico,
+          categoria: newProduct.categoria!,
+        });
+        toast.success('Producto creado correctamente');
+      }
 
-    setIsCreating(false);
-    setEditingProduct(null);
-    setNewProduct({
-      codigo: '',
-      nombre: '',
-      descripcion: '',
-      precio: 0,
-      stock: 0,
-      stockCritico: 0,
-      categoria: 'Periféricos',
-      imagen: '',
-      featured: false,
-    });
+      await cargarProductos();
+      setIsCreating(false);
+      setEditingProduct(null);
+      setNewProduct({
+        codigo: '',
+        nombre: '',
+        descripcion: '',
+        precio: 0,
+        stock: 0,
+        stockCritico: 0,
+        categoria: 'Periféricos',
+        imagen: '',
+        featured: false,
+      });
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || 'Error al guardar el producto';
+      toast.error(errorMessage);
+    }
   };
 
-  const handleDeleteProduct = (id: string) => {
-    setProductos(productos.filter((p) => p.id !== id));
-    toast.success('Producto eliminado correctamente');
+  const handleDeleteProduct = async (id: string) => {
+    if (!confirm('¿Estás seguro de eliminar este producto?')) {
+      return;
+    }
+    try {
+      await apiService.deleteProducto(Number(id));
+      toast.success('Producto eliminado correctamente');
+      await cargarProductos();
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || 'Error al eliminar el producto';
+      toast.error(errorMessage);
+    }
   };
 
   const startEdit = (product: Product) => {

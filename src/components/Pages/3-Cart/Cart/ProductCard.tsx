@@ -1,10 +1,9 @@
 
 import { ShoppingCart, AlertCircle, Star } from 'lucide-react';
-import type { Product } from '../../../../types';
-import { formatPrice } from '../../../../utils/validations';
-import { Button } from '../../../ui/button';
-import { Badge } from '../../../ui/badge';
-import { reviews } from '../../../../data/mockResenia';
+import type { Product } from '@/types';
+import { formatPrice } from '@/utils/validations';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 // Propiedades del componente ProductCard
 interface ProductCardProps {
@@ -18,11 +17,8 @@ export const ProductCard = ({ product, onAddToCart, onViewDetails }: ProductCard
   const isLowStock = product.stockCritico && product.stock <= product.stockCritico;
   const isOutOfStock = product.stock === 0;
   
-  // Calcula calificación promedio del producto
-  const productReviews = reviews.filter(r => r.productId === product.id);
-  const avgRating = productReviews.length > 0
-    ? productReviews.reduce((sum, r) => sum + r.calificacion, 0) / productReviews.length
-    : 0;
+  // Calificación promedio (se puede obtener de la API si es necesario)
+  const avgRating = 0;
 
   return (
     <div className="bg-[#111] border border-[var(--neon-green)] rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] group">
@@ -71,16 +67,6 @@ export const ProductCard = ({ product, onAddToCart, onViewDetails }: ProductCard
         
         <p className="text-gray-400 text-sm mb-3 line-clamp-2">{product.descripcion}</p>
 
-        {/* Calificación */}
-        {avgRating > 0 && (
-          <div className="flex items-center gap-1 mb-3">
-            <Star className="w-4 h-4 fill-[var(--neon-green)] text-[var(--neon-green)]" />
-            <span className="text-[var(--neon-green)] text-sm">
-              {avgRating.toFixed(1)}
-            </span>
-            <span className="text-gray-500 text-xs">({productReviews.length})</span>
-          </div>
-        )}
 
         {/* Precio y Stock */}
         <div className="flex items-center justify-between mb-4">
