@@ -24,6 +24,8 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
   const navItems = [
     { label: 'Inicio', page: 'home' },
     { label: 'Tienda', page: 'catalog' },
+    { label: 'Categorías', page: 'categories' },
+    { label: 'Ofertas', page: 'offers' },
     { label: 'Blog', page: 'blog' },
     { label: 'Contacto', page: 'contact' },
   ];

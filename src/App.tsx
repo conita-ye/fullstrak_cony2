@@ -13,6 +13,11 @@ import { RegisterPage } from "./components/Pages/8-Register/RegisterPage";
 import { BlogPage } from "./components/Pages/2-Blog/BlogPage";
 import { ContactPage } from "./components/Pages/9-Contact/ContactPage";
 import { AdminPage } from "./components/Pages/1-Admin/AdminPage";
+import { CategoriesPage } from "./components/Pages/10-Categories/CategoriesPage";
+import { CheckoutPage } from "./components/Pages/11-Checkout/CheckoutPage";
+import { PurchaseSuccessPage } from "./components/Pages/12-PurchaseSuccess/PurchaseSuccessPage";
+import { PurchaseFailedPage } from "./components/Pages/13-PurchaseFailed/PurchaseFailedPage";
+import { OffersPage } from "./components/Pages/14-Offers/OffersPage";
 import { useState, useEffect } from "react";
 import { BlogDetail } from "./components/Pages/2-Blog/Post/BlogDetail";
 
@@ -26,7 +31,12 @@ type PageType =
   | "blog"
   | "blog-detail"
   | "contact"
-  | "admin";
+  | "admin"
+  | "categories"
+  | "checkout"
+  | "purchase-success"
+  | "purchase-failed"
+  | "offers";
 
 interface NavigationState {
   page: PageType;
@@ -84,6 +94,16 @@ export default function App() {
         return <ContactPage />;
       case "admin":
         return <AdminPage onNavigate={handleNavigate} />;
+      case "categories":
+        return <CategoriesPage onNavigate={handleNavigate} initialData={navigationState.data} />;
+      case "checkout":
+        return <CheckoutPage onNavigate={handleNavigate} />;
+      case "purchase-success":
+        return <PurchaseSuccessPage onNavigate={handleNavigate} orderId={navigationState.data?.orderId} />;
+      case "purchase-failed":
+        return <PurchaseFailedPage onNavigate={handleNavigate} error={navigationState.data?.error} />;
+      case "offers":
+        return <OffersPage onNavigate={handleNavigate} />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }

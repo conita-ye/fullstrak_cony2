@@ -33,7 +33,7 @@ const SeccionCategoria: React.FC<Props> = ({
             <p className="text-gray-400">{descripcion}</p>
           </div>
           <Button
-            onClick={() => onNavigate('catalog', { categoria: titulo })}
+            onClick={() => onNavigate('categories', { categoria: titulo })}
             variant="outline"
             className={`border-[var(--neon-${color})] text-[var(--neon-${color})] hover:bg-[var(--neon-${color})] hover:text-black hidden md:flex`}
           >

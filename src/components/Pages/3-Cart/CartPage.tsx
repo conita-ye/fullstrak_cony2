@@ -56,11 +56,8 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
       return;
     }
 
-    toast.success('Pedido procesado correctamente (simulado)');
-    await clearCart();
-    setCodigoReferido('');
-    setDescuento(0);
-    onNavigate('home');
+    // Navegar a la página de checkout
+    onNavigate('checkout');
   };
 
   if (cart.length === 0) {
