@@ -12,6 +12,13 @@ import {
 import Autoplay from 'embla-carousel-autoplay';
 import type { HomeCarouselProps } from '../Interface/HomeCarouselProps';
 
+// URLs de imágenes del carrusel desde S3
+const CAROUSEL_IMAGES = {
+  banner1: 'https://levelupgamer-assets.s3.us-east-1.amazonaws.com/carousel/banner1-perifericos.jpg',
+  banner2: 'https://levelupgamer-assets.s3.us-east-1.amazonaws.com/carousel/banner2-audio.jpg',
+  banner3: 'https://levelupgamer-assets.s3.us-east-1.amazonaws.com/carousel/banner3-computadores.jpg',
+};
+
 const HomeCarousel: React.FC<HomeCarouselProps> = ({ onNavigate }) => {
   const [carouselApi, setCarouselApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
@@ -52,23 +59,30 @@ const HomeCarousel: React.FC<HomeCarouselProps> = ({ onNavigate }) => {
           
           {/* Banner 1: OFERTA FLASH (Estilo MELI en texto) */}
           <CarouselItem className="pl-0">
-            {/* Fondo sólido con degradado sutil */}
-            <div className="h-[400px] md:h-[500px] bg-gradient-to-r from-gray-900 to-gray-800 flex items-center">
-              <div className="max-w-7xl mx-auto px-4 w-full">
+            {/* Fondo con imagen desde S3 */}
+            <div 
+              className="h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat flex items-center relative"
+              style={{
+                backgroundImage: `url(${CAROUSEL_IMAGES.banner1})`,
+              }}
+            >
+              {/* Overlay oscuro para mejor legibilidad */}
+              <div className="absolute inset-0 bg-black/50"></div>
+              <div className="max-w-7xl mx-auto px-4 w-full relative z-10">
                 <div className="max-w-xl">
-                  <h2 className="text-4xl md:text-5xl mb-4 text-white font-extrabold">
+                  <h2 className="text-4xl md:text-5xl mb-4 text-white font-extrabold drop-shadow-lg">
                     <Zap className="inline-block w-10 h-10 text-yellow-400 mr-2" />
                     OFERTA FLASH EN{' '}
                     {/* Acento en Amarillo MELI */}
                     <span className="text-yellow-400">PERIFÉRICOS</span>
                   </h2>
-                  <p className="text-xl text-gray-300 mb-6">
+                  <p className="text-xl text-gray-200 mb-6 drop-shadow-md">
                     Aprovecha 12 cuotas sin interés en productos seleccionados.
                   </p>
                   <Button
                     onClick={() => onNavigate('catalog', { categoria: 'Periféricos' })}
                     // Botón principal en Amarillo MELI
-                    className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold text-lg px-8 py-6"
+                    className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold text-lg px-8 py-6 shadow-lg"
                   >
                     ¡Comprar ahora!
                     <ArrowRight className="ml-2 w-5 h-5" />
@@ -80,19 +94,26 @@ const HomeCarousel: React.FC<HomeCarouselProps> = ({ onNavigate }) => {
 
           {/* Banner 2: CATEGORÍA DESTACADA (Diseño centrado) */}
           <CarouselItem className="pl-0">
-            {/* Fondo oscuro con toque de azul (Estilo secundario MELI) */}
-            <div className="h-[400px] md:h-[500px] bg-gray-950 flex items-center justify-center">
-              <div className="text-center px-4">
-                <h2 className="text-5xl md:text-7xl mb-6 text-white font-black tracking-tight">
+            {/* Fondo con imagen desde S3 */}
+            <div 
+              className="h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat flex items-center justify-center relative"
+              style={{
+                backgroundImage: `url(${CAROUSEL_IMAGES.banner2})`,
+              }}
+            >
+              {/* Overlay oscuro para mejor legibilidad */}
+              <div className="absolute inset-0 bg-black/50"></div>
+              <div className="text-center px-4 relative z-10">
+                <h2 className="text-5xl md:text-7xl mb-6 text-white font-black tracking-tight drop-shadow-lg">
                   <span className="text-blue-400">AUDIO</span> DE ALTA FIDELIDAD
                 </h2>
-                <p className="text-2xl text-gray-400 mb-8">
+                <p className="text-2xl text-gray-200 mb-8 drop-shadow-md">
                   Auriculares y altavoces diseñados para la inmersión total.
                 </p>
                 <Button
                   onClick={() => onNavigate('catalog', { categoria: 'Audio' })}
                   // Botón secundario en un color de acento (Azul/Cian)
-                  className="bg-blue-600 text-white hover:bg-blue-700 font-bold text-lg px-8 py-6"
+                  className="bg-blue-600 text-white hover:bg-blue-700 font-bold text-lg px-8 py-6 shadow-lg"
                 >
                   Explorar Audio
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -103,21 +124,29 @@ const HomeCarousel: React.FC<HomeCarouselProps> = ({ onNavigate }) => {
 
           {/* Banner 3: COMPUTADORES GAMER (Foco en el branding) */}
           <CarouselItem className="pl-0">
-            <div className="h-[400px] md:h-[500px] bg-gray-800 flex items-center justify-end">
-              <div className="max-w-7xl mx-auto px-4 w-full">
+            {/* Fondo con imagen desde S3 */}
+            <div 
+              className="h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat flex items-center justify-end relative"
+              style={{
+                backgroundImage: `url(${CAROUSEL_IMAGES.banner3})`,
+              }}
+            >
+              {/* Overlay oscuro para mejor legibilidad */}
+              <div className="absolute inset-0 bg-black/50"></div>
+              <div className="max-w-7xl mx-auto px-4 w-full relative z-10">
                 <div className="max-w-xl ml-auto text-right">
-                  <h2 className="text-4xl md:text-5xl mb-4 text-white font-extrabold">
+                  <h2 className="text-4xl md:text-5xl mb-4 text-white font-extrabold drop-shadow-lg">
                     POTENCIA EXTREMA
                     {/* Acento en Amarillo MELI */}
                     <span className="text-yellow-400 block mt-1">GAMER PCS</span>
                   </h2>
-                  <p className="text-xl text-gray-300 mb-6">
+                  <p className="text-xl text-gray-200 mb-6 drop-shadow-md">
                     Arma el setup de tus sueños con la mejor tecnología.
                   </p>
                   <Button
                     onClick={() => onNavigate('catalog', { categoria: 'Computadores' })}
                     // Botón principal en Amarillo MELI
-                    className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold text-lg px-8 py-6"
+                    className="bg-yellow-400 text-gray-900 hover:bg-yellow-500 font-bold text-lg px-8 py-6 shadow-lg"
                   >
                     Ver Computadores
                     <ArrowRight className="ml-2 w-5 h-5" />
