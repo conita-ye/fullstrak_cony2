@@ -373,26 +373,22 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
               <div>
                 <label className="text-gray-300 mb-2 block">Comuna *</label>
                 <Select
-                  value={formData.comuna}
+                  value={formData.comuna || undefined}
                   onValueChange={(value: string) => handleChange('comuna', value)}
                   disabled={!formData.region || comunasDisponibles.length === 0}
                 >
                   <SelectTrigger className="bg-[#1a1a1a] border-gray-700 text-white">
-                    <SelectValue placeholder="Selecciona comuna" />
+                    <SelectValue placeholder={formData.region ? "Selecciona comuna" : "Selecciona una región primero"} />
                   </SelectTrigger>
-                  <SelectContent>
-                    {comunasDisponibles.length > 0 ? (
-                        comunasDisponibles.map((comuna) => (
+                  {comunasDisponibles.length > 0 && (
+                    <SelectContent>
+                      {comunasDisponibles.map((comuna) => (
                         <SelectItem key={comuna} value={comuna}>
-                            {comuna}
+                          {comuna}
                         </SelectItem>
-                        ))
-                    ) : (
-                        <SelectItem value="" disabled>
-                            Selecciona una región primero
-                        </SelectItem>
-                    )}
-                  </SelectContent>
+                      ))}
+                    </SelectContent>
+                  )}
                 </Select>
                 {errors.comuna && <p className="text-red-500 text-sm mt-1">{errors.comuna}</p>}
               </div>
