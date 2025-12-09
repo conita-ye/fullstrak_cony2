@@ -55,15 +55,20 @@ const HomeCarousel: React.FC<HomeCarouselProps> = ({ onNavigate }) => {
         onMouseEnter={() => autoplayPlugin.current.stop()}
         onMouseLeave={() => autoplayPlugin.current.play()}
       >
-        <CarouselContent className="ml-0">
+        <CarouselContent className="ml-0 -ml-0">
           
           {/* Banner 1: OFERTA FLASH (Estilo MELI en texto) */}
-          <CarouselItem className="pl-0">
+          <CarouselItem className="pl-0 basis-full">
             {/* Fondo con imagen desde S3 */}
             <div 
-              className="h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat flex items-center relative"
+              className="h-[400px] md:h-[500px] flex items-center relative w-full"
               style={{
                 backgroundImage: `url(${CAROUSEL_IMAGES.banner1})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center center',
+                backgroundRepeat: 'no-repeat',
+                minWidth: '100%',
+                width: '100%',
               }}
             >
               {/* Overlay oscuro para mejor legibilidad */}
@@ -93,12 +98,17 @@ const HomeCarousel: React.FC<HomeCarouselProps> = ({ onNavigate }) => {
           </CarouselItem>
 
           {/* Banner 2: CATEGORÍA DESTACADA (Diseño centrado) */}
-          <CarouselItem className="pl-0">
+          <CarouselItem className="pl-0 basis-full">
             {/* Fondo con imagen desde S3 */}
             <div 
-              className="h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat flex items-center justify-center relative"
+              className="h-[400px] md:h-[500px] flex items-center justify-center relative w-full"
               style={{
                 backgroundImage: `url(${CAROUSEL_IMAGES.banner2})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center center',
+                backgroundRepeat: 'no-repeat',
+                minWidth: '100%',
+                width: '100%',
               }}
             >
               {/* Overlay oscuro para mejor legibilidad */}
@@ -123,12 +133,17 @@ const HomeCarousel: React.FC<HomeCarouselProps> = ({ onNavigate }) => {
           </CarouselItem>
 
           {/* Banner 3: COMPUTADORES GAMER (Foco en el branding) */}
-          <CarouselItem className="pl-0">
+          <CarouselItem className="pl-0 basis-full">
             {/* Fondo con imagen desde S3 */}
             <div 
-              className="h-[400px] md:h-[500px] bg-cover bg-center bg-no-repeat flex items-center justify-end relative"
+              className="h-[400px] md:h-[500px] flex items-center justify-end relative w-full"
               style={{
                 backgroundImage: `url(${CAROUSEL_IMAGES.banner3})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center center',
+                backgroundRepeat: 'no-repeat',
+                minWidth: '100%',
+                width: '100%',
               }}
             >
               {/* Overlay oscuro para mejor legibilidad */}
