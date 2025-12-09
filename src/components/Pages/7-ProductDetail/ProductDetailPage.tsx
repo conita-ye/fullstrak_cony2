@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Star, AlertCircle, ArrowLeft, Package } from 'lucide-react';
+import { ShoppingCart, Star, AlertCircle, ArrowLeft, Package, Share2, Facebook, Twitter, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -21,6 +21,8 @@ interface Product {
   categoria: string | { id?: number; codigo?: string; nombre?: string; descripcion?: string; activo?: boolean };
   imagenes: string[];
   puntosLevelUp?: number;
+  fabricante?: string;
+  distribuidor?: string;
 }
 
 interface Review {
@@ -147,6 +149,27 @@ export const ProductDetailPage = ({ productId, onNavigate }: ProductDetailPagePr
     }
   };
 
+  const handleShare = (platform: 'facebook' | 'twitter' | 'instagram') => {
+    const url = window.location.href;
+    const text = `¡Mira este producto en Level-Up Gamer: ${product.nombre}!`;
+    
+    let shareUrl = '';
+    switch (platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+        break;
+      case 'instagram':
+        toast.info('Para compartir en Instagram, copia el enlace y pégalo en tu historia');
+        navigator.clipboard.writeText(url);
+        return;
+    }
+    
+    window.open(shareUrl, '_blank', 'width=600,height=400');
+  };
+
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-7xl mx-auto">
@@ -229,8 +252,77 @@ export const ProductDetailPage = ({ productId, onNavigate }: ProductDetailPagePr
             </div>
 
             {/* Código del producto */}
-            <div className="text-sm text-gray-500 mb-6">
+            <div className="text-sm text-gray-500 mb-4">
               Código: <span className="text-[var(--neon-green)]">{product.codigo}</span>
+            </div>
+
+            {/* Origen del producto - Siempre visible */}
+            <div className="bg-[#111] border border-[var(--neon-blue)] rounded-lg p-4 mb-6">
+              <h3 className="text-[var(--neon-blue)] mb-3 text-sm font-semibold flex items-center gap-2">
+                <Package className="w-4 h-4" />
+                Origen del Producto
+              </h3>
+              <div className="space-y-2 text-sm">
+                {product.fabricante ? (
+                  <div>
+                    <span className="text-gray-500">Fabricante: </span>
+                    <span className="text-white font-semibold">{product.fabricante}</span>
+                  </div>
+                ) : (
+                  <div>
+                    <span className="text-gray-500">Fabricante: </span>
+                    <span className="text-gray-400 italic">No especificado</span>
+                  </div>
+                )}
+                {product.distribuidor ? (
+                  <div>
+                    <span className="text-gray-500">Distribuidor: </span>
+                    <span className="text-white font-semibold">{product.distribuidor}</span>
+                  </div>
+                ) : (
+                  <div>
+                    <span className="text-gray-500">Distribuidor: </span>
+                    <span className="text-gray-400 italic">No especificado</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Botones de compartir */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Share2 className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-400">Compartir:</span>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => handleShare('facebook')}
+                  size="sm"
+                  variant="outline"
+                  className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+                >
+                  <Facebook className="w-4 h-4 mr-1" />
+                  Facebook
+                </Button>
+                <Button
+                  onClick={() => handleShare('twitter')}
+                  size="sm"
+                  variant="outline"
+                  className="border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white"
+                >
+                  <Twitter className="w-4 h-4 mr-1" />
+                  Twitter
+                </Button>
+                <Button
+                  onClick={() => handleShare('instagram')}
+                  size="sm"
+                  variant="outline"
+                  className="border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
+                >
+                  <Instagram className="w-4 h-4 mr-1" />
+                  Instagram
+                </Button>
+              </div>
             </div>
 
             {/* Cantidad y agregar al carrito */}

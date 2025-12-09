@@ -182,6 +182,27 @@ class ApiService {
     const response = await this.api.get('/regions');
     return response.data;
   }
+
+  async getNivelUsuario(userId: number) {
+    const response = await this.api.get(`/points/${userId}/level`);
+    return response.data;
+  }
+
+  async getItemsCanjeables() {
+    const response = await this.api.get('/points/redeemable-items');
+    return response.data;
+  }
+
+  async canjearItem(usuarioId: number, itemId: number, tipoItem: string, puntosRequeridos: number, valor?: number) {
+    const response = await this.api.post('/points/redeem-item', {
+      usuarioId,
+      itemId,
+      tipoItem,
+      puntosRequeridos,
+      valor,
+    });
+    return response.data;
+  }
 }
 
 export const apiService = new ApiService();

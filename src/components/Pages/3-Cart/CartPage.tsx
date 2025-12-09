@@ -18,7 +18,11 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
   const [descuento, setDescuento] = useState(0);
 
   const subtotal = getCartTotal() || 0;
-  const total = Math.max(0, subtotal - descuento);
+  
+  // Descuento automático 20% para usuarios @duoc.cl
+  const tieneDescuentoDuoc = user?.correo?.includes('@duoc.cl') || user?.correo?.includes('@profesor.duoc.cl');
+  const descuentoDuoc = tieneDescuentoDuoc ? subtotal * 0.2 : 0;
+  const total = Math.max(0, subtotal - descuento - descuentoDuoc);
 
   if (loading) {
     return (
@@ -182,9 +186,16 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
                   <span>{formatPrice(subtotal)}</span>
                 </div>
 
+                {tieneDescuentoDuoc && (
+                  <div className="flex justify-between text-[var(--neon-green)]">
+                    <span>Descuento Duoc (20%):</span>
+                    <span>-{formatPrice(descuentoDuoc)}</span>
+                  </div>
+                )}
+
                 {descuento > 0 && (
                   <div className="flex justify-between text-[var(--neon-green)]">
-                    <span>Descuento:</span>
+                    <span>Descuento Código:</span>
                     <span>-{formatPrice(descuento)}</span>
                   </div>
                 )}

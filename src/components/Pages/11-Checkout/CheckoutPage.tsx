@@ -101,7 +101,11 @@ export const CheckoutPage = ({ onNavigate }: CheckoutPageProps) => {
 
   const subtotal = getCartTotal();
   const envio = 0; // Gratis
-  const total = subtotal + envio;
+  
+  // Descuento automático 20% para usuarios @duoc.cl
+  const tieneDescuentoDuoc = user?.correo?.includes('@duoc.cl') || user?.correo?.includes('@profesor.duoc.cl');
+  const descuentoDuoc = tieneDescuentoDuoc ? subtotal * 0.2 : 0;
+  const total = subtotal - descuentoDuoc + envio;
 
   return (
     <div className="min-h-screen py-8 px-4">
@@ -312,6 +316,12 @@ export const CheckoutPage = ({ onNavigate }: CheckoutPageProps) => {
                   <span>Subtotal:</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
+                {tieneDescuentoDuoc && (
+                  <div className="flex justify-between text-[var(--neon-green)]">
+                    <span>Descuento Duoc (20%):</span>
+                    <span>-{formatPrice(descuentoDuoc)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-gray-300">
                   <span>Envío:</span>
                   <span className="text-[var(--neon-green)]">GRATIS</span>

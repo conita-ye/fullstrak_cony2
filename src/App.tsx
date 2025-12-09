@@ -18,6 +18,8 @@ import { CheckoutPage } from "./components/Pages/11-Checkout/CheckoutPage";
 import { PurchaseSuccessPage } from "./components/Pages/12-PurchaseSuccess/PurchaseSuccessPage";
 import { PurchaseFailedPage } from "./components/Pages/13-PurchaseFailed/PurchaseFailedPage";
 import { OffersPage } from "./components/Pages/14-Offers/OffersPage";
+import { EventsPage } from "./components/Pages/15-Events/EventsPage";
+import { PointsPage } from "./components/Pages/16-Points/PointsPage";
 import { useState, useEffect } from "react";
 import { BlogDetail } from "./components/Pages/2-Blog/Post/BlogDetail";
 
@@ -36,7 +38,9 @@ type PageType =
   | "checkout"
   | "purchase-success"
   | "purchase-failed"
-  | "offers";
+  | "offers"
+  | "events"
+  | "points";
 
 interface NavigationState {
   page: PageType;
@@ -104,6 +108,10 @@ export default function App() {
         return <PurchaseFailedPage onNavigate={handleNavigate} error={navigationState.data?.error} />;
       case "offers":
         return <OffersPage onNavigate={handleNavigate} />;
+      case "events":
+        return <EventsPage onNavigate={handleNavigate} />;
+      case "points":
+        return <PointsPage onNavigate={handleNavigate} />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }

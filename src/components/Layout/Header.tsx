@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ShoppingCart, User, LogOut, Menu, X, Search } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Menu, X, Search, Award } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { Button } from '@/components/ui/button';
+import { getLevelByPoints } from '@/utils/pointsSystem';
 interface HeaderProps {
   onNavigate: (page: string) => void;
   currentPage: string;
@@ -26,6 +27,7 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
     { label: 'Tienda', page: 'catalog' },
     { label: 'Categorías', page: 'categories' },
     { label: 'Ofertas', page: 'offers' },
+    { label: 'Eventos', page: 'events' },
     { label: 'Blog', page: 'blog' },
     { label: 'Contacto', page: 'contact' },
   ];
@@ -83,6 +85,18 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
 
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
+                {user && (
+                  <button
+                    onClick={() => onNavigate('points')}
+                    className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-[#1a1a1a] border border-[var(--neon-green)] rounded-lg hover:bg-[var(--neon-green)] hover:text-black transition-colors"
+                    title={`Nivel ${getLevelByPoints(user.puntosLevelUp || 0).nombre} - ${user.puntosLevelUp || 0} puntos`}
+                  >
+                    <Award className="w-4 h-4 text-[var(--neon-green)]" />
+                    <span className="text-xs text-white">
+                      {getLevelByPoints(user.puntosLevelUp || 0).nombre}
+                    </span>
+                  </button>
+                )}
                 <span className="text-gray-300 text-sm hidden lg:block">
                   {user?.nombre} {user?.apellidos && user.apellidos} <span className="text-yellow-400">({user?.rol})</span>
                 </span>
@@ -194,6 +208,19 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
                   <ShoppingCart className="w-5 h-5" />
                   Carrito ({cartCount})
                 </button>
+
+                {isAuthenticated && (
+                  <button
+                    onClick={() => {
+                      onNavigate('points');
+                      setIsMenuOpen(false);
+                    }}
+                    className="text-left py-2 text-gray-300 flex items-center gap-2 hover:text-yellow-400"
+                  >
+                    <Award className="w-5 h-5" />
+                    Mis Puntos ({user?.puntosLevelUp || 0}) - {user && getLevelByPoints(user.puntosLevelUp || 0).nombre}
+                  </button>
+                )}
 
                 {isAuthenticated ? (
                   <>

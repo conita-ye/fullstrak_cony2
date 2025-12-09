@@ -50,6 +50,7 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
     region: '',
     comuna: '',
     rol: 'cliente',
+    codigoReferido: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -176,7 +177,11 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
     const success = await register(payload);
 
     if (success) {
-      toast.success('Registro exitoso. ¡Bienvenido a Level-Up Gamer!');
+      if (formData.codigoReferido) {
+        toast.success('Registro exitoso. ¡Bienvenido a Level-Up Gamer! Has usado un código referido, ambos ganaréis puntos LevelUp.');
+      } else {
+        toast.success('Registro exitoso. ¡Bienvenido a Level-Up Gamer!');
+      }
       onNavigate('home');
     }
   };
@@ -397,6 +402,26 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
                   )}
                 </Select>
                 {errors.comuna && <p className="text-red-500 text-sm mt-1">{errors.comuna}</p>}
+              </div>
+
+              {/* --- Código Referido (Opcional) --- */}
+              <div className="md:col-span-2">
+                <label className="text-gray-300 mb-2 block">
+                  Código de Referido <span className="text-gray-500 text-xs">(Opcional)</span>
+                </label>
+                <div className="relative">
+                  <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Input
+                    type="text"
+                    placeholder="Ingresa el código de referido si tienes uno"
+                    value={formData.codigoReferido || ''}
+                    onChange={(e) => handleChange('codigoReferido', e.target.value)}
+                    className="pl-10 bg-[#1a1a1a] border-gray-700 text-white"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Si alguien te refirió, ingresa su código y ambos ganaréis puntos LevelUp
+                </p>
               </div>
             </div>
 
