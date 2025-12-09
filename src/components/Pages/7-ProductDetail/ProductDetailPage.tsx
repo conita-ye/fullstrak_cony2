@@ -144,7 +144,7 @@ export const ProductDetailPage = ({ productId, onNavigate }: ProductDetailPagePr
       setNewReview({ calificacion: 5, comentario: '' });
       await cargarResenas();
     } catch (error: any) {
-      const errorMessage = error.response?.data?.error || 'Error al enviar la reseña';
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Error al enviar la reseña';
       toast.error(errorMessage);
     }
   };

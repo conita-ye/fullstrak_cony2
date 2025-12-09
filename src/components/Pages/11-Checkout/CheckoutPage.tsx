@@ -83,16 +83,28 @@ export const CheckoutPage = ({ onNavigate }: CheckoutPageProps) => {
 
     setLoading(true);
     try {
-      // Simular procesamiento de pago
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      
-      // Aquí iría la lógica real de crear la boleta/orden
-      // await apiService.crearBoleta({ ...formData, items: cart });
+      // Preparar detalles de la boleta
+      const detalles = cart.map(item => ({
+        productoId: item.productId,
+        cantidad: item.quantity
+      }));
+
+      // Crear la boleta en el backend
+      const boletaData = {
+        cliente: user!.id,  // El backend espera "cliente" según @JsonProperty
+        detalles: detalles,
+        total: total
+      };
+
+      const boleta = await apiService.crearBoleta(boletaData);
       
       await clearCart();
-      onNavigate('purchase-success', { orderId: Math.random().toString(36).substr(2, 9) });
-    } catch (error) {
-      toast.error('Error al procesar el pago');
+      toast.success('¡Compra realizada exitosamente!');
+      onNavigate('purchase-success', { orderId: boleta.id || boleta.numeroBoleta || Math.random().toString(36).substr(2, 9) });
+    } catch (error: any) {
+      console.error('Error al procesar la compra:', error);
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Error al procesar el pago';
+      toast.error(errorMessage);
       onNavigate('purchase-failed');
     } finally {
       setLoading(false);

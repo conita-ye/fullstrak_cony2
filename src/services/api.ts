@@ -183,6 +183,11 @@ class ApiService {
     return response.data;
   }
 
+  async crearBoleta(boletaData: any) {
+    const response = await this.api.post('/boletas', boletaData);
+    return response.data;
+  }
+
   async getNivelUsuario(userId: number) {
     const response = await this.api.get(`/points/${userId}/level`);
     return response.data;
