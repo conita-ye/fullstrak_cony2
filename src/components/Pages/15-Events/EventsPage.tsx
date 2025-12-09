@@ -109,19 +109,64 @@ export const EventsPage = ({ onNavigate }: EventsPageProps) => {
                 Mapa de Eventos
               </h2>
               
-              {/* Mapa de Chile con imagen real */}
+              {/* Mapa de Chile con SVG detallado */}
               <div className="relative w-full h-[500px] bg-[#1a1a1a] rounded-lg overflow-hidden">
-                {/* Imagen de Chile como fondo */}
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Chile_location_map.svg/800px-Chile_location_map.svg.png"
-                  alt="Mapa de Chile"
-                  className="w-full h-full object-contain opacity-30"
-                  style={{ filter: 'brightness(0.3) contrast(1.2)' }}
-                  onError={(e) => {
-                    // Fallback si la imagen no carga
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
+                {/* SVG de Chile con forma más realista */}
+                <svg
+                  className="absolute inset-0 w-full h-full"
+                  viewBox="0 0 200 800"
+                  preserveAspectRatio="xMidYMid meet"
+                >
+                  {/* Fondo */}
+                  <rect width="200" height="800" fill="#0a0a0a" />
+                  
+                  {/* Forma de Chile más detallada - basada en coordenadas reales */}
+                  <path
+                    d="M 35 15 
+                       L 38 25 L 42 45 L 46 70 L 50 100 L 52 130 L 54 160 
+                       L 56 200 L 58 240 L 60 280 L 62 320 L 64 360 
+                       L 66 400 L 68 440 L 70 480 L 72 520 L 74 560 
+                       L 76 600 L 78 640 L 80 680 L 82 720 L 84 750 
+                       L 85 770 L 84 780 L 82 775 L 80 765 L 78 750 
+                       L 76 730 L 74 710 L 72 690 L 70 670 L 68 650 
+                       L 66 630 L 64 610 L 62 590 L 60 570 L 58 550 
+                       L 56 530 L 54 510 L 52 490 L 50 470 L 48 450 
+                       L 46 430 L 44 410 L 42 390 L 40 370 L 38 350 
+                       L 36 330 L 34 310 L 32 290 L 30 270 L 28 250 
+                       L 26 230 L 24 210 L 22 190 L 20 170 L 18 150 
+                       L 16 130 L 14 110 L 12 90 L 10 70 L 8 50 
+                       L 6 30 L 4 20 Z"
+                    fill="#1a1a1a"
+                    stroke="var(--neon-green)"
+                    strokeWidth="2.5"
+                    opacity="0.4"
+                  />
+                  
+                  {/* Líneas de costa este (Andes) */}
+                  <path
+                    d="M 85 770 L 84 750 L 83 720 L 82 680 L 81 640 L 80 600 L 79 560 L 78 520 L 77 480 L 76 440 L 75 400 L 74 360 L 73 320 L 72 280 L 71 240 L 70 200 L 69 160 L 68 120 L 67 80 L 66 50 L 65 30"
+                    fill="none"
+                    stroke="var(--neon-blue)"
+                    strokeWidth="1.5"
+                    opacity="0.3"
+                  />
+                  
+                  {/* Líneas de costa oeste (Pacífico) */}
+                  <path
+                    d="M 35 15 L 36 20 L 37 30 L 38 45 L 39 65 L 40 85 L 41 105 L 42 125 L 43 145 L 44 165 L 45 185 L 46 205 L 47 225 L 48 245 L 49 265 L 50 285"
+                    fill="none"
+                    stroke="var(--neon-purple)"
+                    strokeWidth="1.5"
+                    opacity="0.3"
+                  />
+                  
+                  {/* Regiones principales marcadas */}
+                  <circle cx="50" cy="200" r="3" fill="var(--neon-green)" opacity="0.6" />
+                  <circle cx="48" cy="250" r="3" fill="var(--neon-green)" opacity="0.6" />
+                  <circle cx="52" cy="350" r="3" fill="var(--neon-green)" opacity="0.6" />
+                  <circle cx="54" cy="450" r="3" fill="var(--neon-green)" opacity="0.6" />
+                  <circle cx="42" cy="100" r="3" fill="var(--neon-green)" opacity="0.6" />
+                </svg>
                 
                 {/* Marcadores de eventos posicionados absolutamente */}
                 {eventos.map((event, index) => {
