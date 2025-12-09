@@ -109,61 +109,59 @@ export const EventsPage = ({ onNavigate }: EventsPageProps) => {
                 Mapa de Eventos
               </h2>
               
-              {/* Mapa SVG simplificado de Chile */}
+              {/* Mapa de Chile con imagen real */}
               <div className="relative w-full h-[500px] bg-[#1a1a1a] rounded-lg overflow-hidden">
-                <svg
-                  viewBox="0 0 200 800"
-                  className="w-full h-full"
-                  style={{ maxHeight: '500px' }}
-                >
-                  {/* Forma simplificada de Chile */}
-                  <path
-                    d="M 50 50 L 60 100 L 70 200 L 75 300 L 80 400 L 85 500 L 90 600 L 95 700 L 100 750 L 95 750 L 90 700 L 85 600 L 80 500 L 75 400 L 70 300 L 65 200 L 60 100 Z"
-                    fill="#1a1a1a"
-                    stroke="var(--neon-green)"
-                    strokeWidth="2"
-                  />
+                {/* Imagen de Chile como fondo */}
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Chile_location_map.svg/800px-Chile_location_map.svg.png"
+                  alt="Mapa de Chile"
+                  className="w-full h-full object-contain opacity-30"
+                  style={{ filter: 'brightness(0.3) contrast(1.2)' }}
+                  onError={(e) => {
+                    // Fallback si la imagen no carga
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+                
+                {/* Marcadores de eventos posicionados absolutamente */}
+                {eventos.map((event, index) => {
+                  // Posiciones porcentuales basadas en coordenadas reales de Chile
+                  // Calculadas desde las coordenadas lat/lng
+                  const positions = [
+                    { left: '48%', top: '38%' }, // Santiago (-33.4489, -70.6693)
+                    { left: '45%', top: '35%' }, // Valparaíso (-33.0472, -71.6127)
+                    { left: '50%', top: '52%' }, // Concepción (-36.8201, -73.0444)
+                    { left: '52%', top: '58%' }, // Temuco (-38.7359, -72.5904)
+                    { left: '38%', top: '18%' }, // Antofagasta (-23.6509, -70.3975)
+                  ];
+                  const pos = positions[index] || { left: '48%', top: '38%' };
                   
-                  {/* Marcadores de eventos */}
-                  {eventos.map((event, index) => {
-                    // Posiciones aproximadas en el mapa SVG
-                    const positions = [
-                      { x: 70, y: 200 }, // Santiago (centro)
-                      { x: 65, y: 250 }, // Valparaíso
-                      { x: 75, y: 350 }, // Concepción
-                      { x: 80, y: 450 }, // Temuco
-                      { x: 60, y: 100 }, // Antofagasta
-                    ];
-                    const pos = positions[index] || { x: 70, y: 200 };
-                    
-                    return (
-                      <g key={event.id}>
-                        <circle
-                          cx={pos.x}
-                          cy={pos.y}
-                          r="8"
-                          fill="var(--neon-green)"
-                          stroke="var(--neon-purple)"
-                          strokeWidth="2"
-                          className="cursor-pointer hover:fill-[var(--neon-purple)] transition-colors"
-                          onClick={() => handleEventClick(event)}
-                        />
-                        {selectedEvent?.id === event.id && (
-                          <text
-                            x={pos.x}
-                            y={pos.y - 15}
-                            fill="var(--neon-green)"
-                            fontSize="10"
-                            textAnchor="middle"
-                            className="font-bold"
-                          >
+                  return (
+                    <div
+                      key={event.id}
+                      className="absolute cursor-pointer group"
+                      style={{ left: pos.left, top: pos.top, transform: 'translate(-50%, -50%)' }}
+                      onClick={() => handleEventClick(event)}
+                    >
+                      {/* Marcador con pulso */}
+                      <div className="relative">
+                        <div className="absolute inset-0 rounded-full bg-[var(--neon-green)] animate-ping opacity-75"></div>
+                        <div className="relative w-6 h-6 rounded-full bg-[var(--neon-green)] border-2 border-[var(--neon-purple)] shadow-lg shadow-[var(--neon-green)]/50 flex items-center justify-center group-hover:scale-125 transition-transform">
+                          <div className="w-2 h-2 rounded-full bg-white"></div>
+                        </div>
+                      </div>
+                      
+                      {/* Etiqueta con nombre de ciudad */}
+                      {selectedEvent?.id === event.id && (
+                        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                          <div className="bg-black/90 border border-[var(--neon-green)] rounded-lg px-3 py-1 text-xs text-[var(--neon-green)] font-bold shadow-lg">
                             {event.ciudad}
-                          </text>
-                        )}
-                      </g>
-                    );
-                  })}
-                </svg>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
                 
                 {/* Leyenda */}
                 <div className="absolute bottom-4 left-4 bg-black/80 border border-[var(--neon-green)] rounded-lg p-3">
