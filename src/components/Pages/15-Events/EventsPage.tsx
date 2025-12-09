@@ -110,15 +110,16 @@ export const EventsPage = ({ onNavigate }: EventsPageProps) => {
               </h2>
               
               {/* Mapa de Chile con imagen SVG real */}
-              <div className="relative w-full h-[500px] bg-[#1a1a1a] rounded-lg overflow-hidden">
-                {/* Imagen SVG de Chile como fondo */}
+              <div className="relative w-full h-[500px] bg-[#1a1a1a] rounded-lg overflow-hidden flex items-center justify-center">
+                {/* Imagen SVG de Chile como fondo - centrada */}
                 <img
                   src="/chile.svg"
                   alt="Mapa de Chile"
-                  className="w-full h-full object-contain"
+                  className="max-w-full max-h-full object-contain"
                   style={{ 
                     filter: 'brightness(0.2) contrast(1.3)',
-                    opacity: 0.4
+                    opacity: 0.4,
+                    objectPosition: 'center'
                   }}
                   onError={(e) => {
                     // Fallback si no carga
@@ -130,15 +131,16 @@ export const EventsPage = ({ onNavigate }: EventsPageProps) => {
                 {/* Marcadores de eventos posicionados absolutamente sobre el mapa */}
                 {eventos.map((event, index) => {
                   // Posiciones porcentuales basadas en coordenadas reales de Chile
-                  // Ajustadas para el SVG real de Chile (viewBox: 0 0 612.5365 708.72205)
+                  // Ajustadas para el SVG centrado de Chile (viewBox: 0 0 612.5365 708.72205)
+                  // Coordenadas aproximadas: latitud (-17.5 a -55.9), longitud (-109.4 a -66.4)
                   const positions = [
-                    { left: '50%', top: '42%' }, // Santiago (-33.4489, -70.6693) - centro
-                    { left: '48%', top: '40%' }, // Valparaíso (-33.0472, -71.6127) - centro-oeste
-                    { left: '52%', top: '55%' }, // Concepción (-36.8201, -73.0444) - sur
-                    { left: '54%', top: '62%' }, // Temuco (-38.7359, -72.5904) - sur
-                    { left: '42%', top: '22%' }, // Antofagasta (-23.6509, -70.3975) - norte
+                    { left: '48%', top: '43%' }, // Santiago (-33.4489, -70.6693) - centro
+                    { left: '46%', top: '41%' }, // Valparaíso (-33.0472, -71.6127) - centro-oeste
+                    { left: '47%', top: '56%' }, // Concepción (-36.8201, -73.0444) - sur
+                    { left: '48%', top: '63%' }, // Temuco (-38.7359, -72.5904) - sur
+                    { left: '43%', top: '23%' }, // Antofagasta (-23.6509, -70.3975) - norte
                   ];
-                  const pos = positions[index] || { left: '50%', top: '42%' };
+                  const pos = positions[index] || { left: '48%', top: '43%' };
                   
                   return (
                     <div
