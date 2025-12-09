@@ -1,7 +1,44 @@
-// Validación de RUN chileno
+// Validación de RUN chileno con dígito verificador
 export const validateRUN = (run: string): boolean => {
-  const cleanRun = run.replace(/\./g, '').replace(/-/g, '');
-  return cleanRun.length >= 7 && cleanRun.length <= 9;
+  if (!run || run.trim() === '') return false;
+  
+  try {
+    // Limpiar el RUN: quitar puntos, guiones y convertir a mayúsculas
+    let cleanRun = run.toUpperCase().replace(/\./g, '').replace(/-/g, '');
+    
+    // Validar longitud (debe tener al menos 7 caracteres: 6 dígitos + 1 dígito verificador)
+    if (cleanRun.length < 7 || cleanRun.length > 9) {
+      return false;
+    }
+    
+    // Separar el número del dígito verificador
+    const rutNumber = cleanRun.substring(0, cleanRun.length - 1);
+    const providedDv = cleanRun.charAt(cleanRun.length - 1);
+    
+    // Validar que el número sea válido
+    const rutAux = parseInt(rutNumber, 10);
+    if (isNaN(rutAux) || rutAux <= 0) {
+      return false;
+    }
+    
+    // Calcular el dígito verificador esperado usando el algoritmo chileno
+    let s = 1;
+    let m = 0;
+    let rutTemp = rutAux;
+    
+    while (rutTemp !== 0) {
+      s = (s + (rutTemp % 10) * (9 - (m++ % 6))) % 11;
+      rutTemp = Math.floor(rutTemp / 10);
+    }
+    
+    // El dígito verificador esperado
+    const expectedDv = s !== 0 ? String.fromCharCode(s + 47) : 'K';
+    
+    // Comparar con el dígito verificador proporcionado
+    return providedDv === expectedDv;
+  } catch (error) {
+    return false;
+  }
 };
 
 // Validación de correo electrónico con dominios permitidos

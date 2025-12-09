@@ -125,8 +125,10 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
     // Validación de Contraseña
     if (!formData.password) {
       newErrors.password = 'La contraseña es obligatoria';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
+    } else if (formData.password.length > 32) {
+      newErrors.password = 'La contraseña no puede tener más de 32 caracteres';
     }
 
     if (!formData.confirmPassword || formData.password !== formData.confirmPassword) {
