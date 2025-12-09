@@ -22,7 +22,7 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-center">
           <p className="text-gray-400">Cargando carrito...</p>
         </div>

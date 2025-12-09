@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Package, Users, ShoppingCart, TrendingUp, Plus, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,7 +30,7 @@ export const AdminPage = ({ onNavigate }: AdminPageProps) => {
     try {
       setLoading(true);
       const productosData = await apiService.getProductos();
-      setProductos(productosData.map(p => ({
+      setProductos(productosData.map((p: any) => ({
         id: String(p.id),
         codigo: p.codigo,
         nombre: p.nombre,
@@ -38,7 +38,9 @@ export const AdminPage = ({ onNavigate }: AdminPageProps) => {
         precio: p.precio,
         stock: p.stock,
         stockCritico: p.stockCritico,
-        categoria: p.categoria,
+        categoria: typeof p.categoria === 'object' && p.categoria !== null 
+          ? (p.categoria.nombre || p.categoria.codigo || 'Sin categoría')
+          : (p.categoria || 'Sin categoría'),
         imagen: p.imagenes && p.imagenes.length > 0 ? p.imagenes[0] : '',
         featured: (p.puntosLevelUp || 0) >= 500
       })));
@@ -65,7 +67,7 @@ export const AdminPage = ({ onNavigate }: AdminPageProps) => {
 
   if (user?.rol !== 'admin' && user?.rol !== 'ADMINISTRADOR') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-center">
           <h2 className="text-2xl text-red-500 mb-4">Acceso Denegado</h2>
           <p className="text-gray-400 mb-6">
@@ -170,8 +172,18 @@ export const AdminPage = ({ onNavigate }: AdminPageProps) => {
     setIsCreating(true);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="text-center">
+          <p className="text-gray-400">Cargando productos...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen py-8 px-4">
+    <div className="min-h-screen py-8 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-4xl mb-2 text-[var(--neon-green)]">Panel de Administración</h1>
