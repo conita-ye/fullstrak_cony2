@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/contexts/AuthContext';
 import { apiService } from '@/services/api';
-import { Product } from '@/types';
+import type { Product } from '@/types';
 import { formatPrice, validateProductCode, validatePrice, validateStock } from '@/utils/validations';
 import { toast } from 'sonner';
 
