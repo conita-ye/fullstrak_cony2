@@ -101,86 +101,191 @@ export const EventsPage = ({ onNavigate }: EventsPageProps) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Mapa de Chile */}
+          {/* Detalles del Evento Seleccionado */}
           <div className="lg:col-span-2">
-            <div className="bg-[#111] border border-[var(--neon-green)] rounded-lg p-6">
-              <h2 className="text-2xl mb-6 text-[var(--neon-green)] flex items-center gap-2">
-                <MapPin className="w-6 h-6" />
-                Mapa de Eventos
-              </h2>
-              
-              {/* Mapa de Chile con imagen SVG real */}
-              <div className="relative w-full h-[500px] bg-[#1a1a1a] rounded-lg overflow-hidden flex items-center justify-center">
-                {/* Imagen SVG de Chile como fondo - centrada */}
-                <img
-                  src="/chile.svg"
-                  alt="Mapa de Chile"
-                  className="max-w-full max-h-full object-contain"
-                  style={{ 
-                    filter: 'brightness(0.2) contrast(1.3)',
-                    opacity: 0.4,
-                    objectPosition: 'center'
-                  }}
-                  onError={(e) => {
-                    // Fallback si no carga
-                    console.error('Error al cargar mapa de Chile');
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
+            {selectedEvent ? (
+              <div className="bg-[#111] border border-[var(--neon-green)] rounded-lg p-6 max-h-[600px] overflow-y-auto">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl text-[var(--neon-green)] flex items-center gap-2">
+                    <Award className="w-6 h-6" />
+                    {selectedEvent.nombre}
+                  </h2>
+                  <Button
+                    variant="outline"
+                    onClick={() => setSelectedEvent(null)}
+                    className="border-[var(--neon-green)] text-[var(--neon-green)] hover:bg-[var(--neon-green)] hover:text-black"
+                  >
+                    Limpiar Selección
+                  </Button>
+                </div>
                 
-                {/* Marcadores de eventos posicionados absolutamente sobre el mapa */}
-                {eventos.map((event, index) => {
-                  // Posiciones porcentuales basadas en coordenadas reales de Chile
-                  // Ajustadas para el SVG centrado de Chile (viewBox: 0 0 612.5365 708.72205)
-                  // Coordenadas aproximadas: latitud (-17.5 a -55.9), longitud (-109.4 a -66.4)
-                  const positions = [
-                    { left: '48%', top: '43%' }, // Santiago (-33.4489, -70.6693) - centro
-                    { left: '46%', top: '41%' }, // Valparaíso (-33.0472, -71.6127) - centro-oeste
-                    { left: '47%', top: '56%' }, // Concepción (-36.8201, -73.0444) - sur
-                    { left: '48%', top: '63%' }, // Temuco (-38.7359, -72.5904) - sur
-                    { left: '43%', top: '23%' }, // Antofagasta (-23.6509, -70.3975) - norte
-                  ];
-                  const pos = positions[index] || { left: '48%', top: '43%' };
-                  
-                  return (
-                    <div
-                      key={event.id}
-                      className="absolute cursor-pointer group"
-                      style={{ left: pos.left, top: pos.top, transform: 'translate(-50%, -50%)' }}
-                      onClick={() => handleEventClick(event)}
-                    >
-                      {/* Marcador con pulso */}
-                      <div className="relative">
-                        <div className="absolute inset-0 rounded-full bg-[var(--neon-green)] animate-ping opacity-75"></div>
-                        <div className="relative w-6 h-6 rounded-full bg-[var(--neon-green)] border-2 border-[var(--neon-purple)] shadow-lg shadow-[var(--neon-green)]/50 flex items-center justify-center group-hover:scale-125 transition-transform">
-                          <div className="w-2 h-2 rounded-full bg-white"></div>
-                        </div>
-                      </div>
-                      
-                      {/* Etiqueta con nombre de ciudad */}
-                      {selectedEvent?.id === event.id && (
-                        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-                          <div className="bg-black/90 border border-[var(--neon-green)] rounded-lg px-3 py-1 text-xs text-[var(--neon-green)] font-bold shadow-lg">
-                            {event.ciudad}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-                
-                {/* Leyenda */}
-                <div className="absolute bottom-4 left-4 bg-black/80 border border-[var(--neon-green)] rounded-lg p-3">
-                  <div className="flex items-center gap-2 text-sm text-gray-300">
-                    <div className="w-3 h-3 rounded-full bg-[var(--neon-green)]"></div>
-                    <span>Evento disponible</span>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-xl mb-3 text-[var(--neon-green)]">Descripción del Evento</h3>
+                    <p className="text-gray-300 leading-relaxed">{selectedEvent.descripcion}</p>
+                    {selectedEvent.id === 1 && (
+                      <p className="text-gray-400 mt-3 text-sm">
+                        El torneo más importante del año reúne a los mejores equipos de esports de todo Chile. 
+                        Competencias en múltiples categorías con premios en efectivo superiores a $10.000.000. 
+                        El evento contará con transmisión en vivo, comentaristas profesionales, y la presencia 
+                        de equipos internacionales invitados.
+                      </p>
+                    )}
+                    {selectedEvent.id === 2 && (
+                      <p className="text-gray-400 mt-3 text-sm">
+                        La feria más grande de productos gaming de la región. Descubre las últimas tecnologías, 
+                        periféricos, y hardware gaming. Demostraciones en vivo de las nuevas consolas, 
+                        oportunidades de probar juegos antes de su lanzamiento, y descuentos exclusivos 
+                        para asistentes del evento.
+                      </p>
+                    )}
+                    {selectedEvent.id === 3 && (
+                      <p className="text-gray-400 mt-3 text-sm">
+                        Sé uno de los primeros en probar la PlayStation 6 antes de su lanzamiento oficial. 
+                        Evento exclusivo con sesiones de juego guiadas, presentaciones de nuevas funciones, 
+                        y la oportunidad de conocer a desarrolladores de juegos. Cupos limitados.
+                      </p>
+                    )}
+                    {selectedEvent.id === 4 && (
+                      <p className="text-gray-400 mt-3 text-sm">
+                        Este torneo regional reúne a los mejores jugadores de la zona sur de Chile. 
+                        Los participantes competirán en múltiples categorías de videojuegos, incluyendo 
+                        League of Legends, Counter-Strike 2, y Valorant. El evento contará con transmisión 
+                        en vivo, stands de patrocinadores, y la oportunidad de conocer a streamers profesionales.
+                      </p>
+                    )}
+                    {selectedEvent.id === 5 && (
+                      <p className="text-gray-400 mt-3 text-sm">
+                        Festival de gaming con la presencia de los streamers y youtubers más populares de Chile. 
+                        Meet & greet, firmas de autógrafos, competencias de cosplay, y torneos abiertos. 
+                        Zona de food trucks, música en vivo, y actividades para toda la familia.
+                      </p>
+                    )}
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Haz clic en los marcadores para ver detalles
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Calendar className="w-5 h-5 text-[var(--neon-green)]" />
+                        <h4 className="text-white font-semibold">Fecha y Hora</h4>
+                      </div>
+                      <p className="text-gray-300">
+                        {new Date(selectedEvent.fecha).toLocaleDateString('es-CL', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </p>
+                      <p className="text-gray-400 text-sm mt-1">10:00 AM - 8:00 PM</p>
+                    </div>
+                    
+                    <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <MapPin className="w-5 h-5 text-[var(--neon-green)]" />
+                        <h4 className="text-white font-semibold">Ubicación</h4>
+                      </div>
+                      <p className="text-gray-300">{selectedEvent.ubicacion}</p>
+                      <p className="text-gray-400 text-sm mt-1">{selectedEvent.ciudad}</p>
+                    </div>
+                    
+                    <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Award className="w-5 h-5 text-[var(--neon-green)]" />
+                        <h4 className="text-white font-semibold">Puntos LevelUp</h4>
+                      </div>
+                      <p className="text-2xl font-bold text-[var(--neon-green)]">{selectedEvent.puntosLevelUp} puntos</p>
+                      <p className="text-gray-400 text-sm mt-1">Por asistir y participar</p>
+                    </div>
+                    
+                    <div className="bg-[#1a1a1a] border border-gray-800 rounded-lg p-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Users className="w-5 h-5 text-[var(--neon-green)]" />
+                        <h4 className="text-white font-semibold">Categorías</h4>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {selectedEvent.id === 1 && (
+                          <>
+                            <Badge className="bg-[var(--neon-purple)] text-white">League of Legends</Badge>
+                            <Badge className="bg-[var(--neon-purple)] text-white">CS2</Badge>
+                            <Badge className="bg-[var(--neon-purple)] text-white">Valorant</Badge>
+                            <Badge className="bg-[var(--neon-purple)] text-white">Rocket League</Badge>
+                          </>
+                        )}
+                        {selectedEvent.id === 2 && (
+                          <>
+                            <Badge className="bg-[var(--neon-purple)] text-white">Exposición</Badge>
+                            <Badge className="bg-[var(--neon-purple)] text-white">Demostraciones</Badge>
+                            <Badge className="bg-[var(--neon-purple)] text-white">Descuentos</Badge>
+                          </>
+                        )}
+                        {selectedEvent.id === 3 && (
+                          <>
+                            <Badge className="bg-[var(--neon-purple)] text-white">PlayStation 6</Badge>
+                            <Badge className="bg-[var(--neon-purple)] text-white">Exclusivo</Badge>
+                            <Badge className="bg-[var(--neon-purple)] text-white">Lanzamiento</Badge>
+                          </>
+                        )}
+                        {selectedEvent.id === 4 && (
+                          <>
+                            <Badge className="bg-[var(--neon-purple)] text-white">League of Legends</Badge>
+                            <Badge className="bg-[var(--neon-purple)] text-white">CS2</Badge>
+                            <Badge className="bg-[var(--neon-purple)] text-white">Valorant</Badge>
+                          </>
+                        )}
+                        {selectedEvent.id === 5 && (
+                          <>
+                            <Badge className="bg-[var(--neon-purple)] text-white">Streamers</Badge>
+                            <Badge className="bg-[var(--neon-purple)] text-white">Cosplay</Badge>
+                            <Badge className="bg-[var(--neon-purple)] text-white">Torneos</Badge>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gradient-to-br from-[var(--neon-green)]/20 to-[var(--neon-purple)]/20 border border-[var(--neon-green)] rounded-lg p-6">
+                    <h3 className="text-xl mb-4 text-[var(--neon-green)]">Información Adicional</h3>
+                    <ul className="space-y-3 text-gray-300">
+                      <li className="flex items-start gap-2">
+                        <span className="text-[var(--neon-green)] mt-1">•</span>
+                        <span>Inscripción gratuita en el lugar del evento</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-[var(--neon-green)] mt-1">•</span>
+                        <span>Premios en efectivo para los primeros lugares</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-[var(--neon-green)] mt-1">•</span>
+                        <span>Transmisión en vivo en Twitch y YouTube</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-[var(--neon-green)] mt-1">•</span>
+                        <span>Zona de food trucks y stands de productos gaming</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <Button
+                    onClick={() => handleClaimPoints(selectedEvent)}
+                    className="w-full bg-[var(--neon-green)] text-black hover:bg-[var(--neon-purple)] hover:text-white text-lg py-6"
+                  >
+                    <Award className="w-5 h-5 mr-2" />
+                    Reclamar Puntos por Asistencia
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-[#111] border border-[var(--neon-green)] rounded-lg p-6 h-[600px] flex items-center justify-center">
+                <div className="text-center">
+                  <MapPin className="w-16 h-16 text-[var(--neon-green)] mx-auto mb-4 opacity-50" />
+                  <h3 className="text-xl text-gray-400 mb-2">Selecciona un evento</h3>
+                  <p className="text-gray-500 text-sm">
+                    Haz clic en cualquier evento de la lista para ver sus detalles
                   </p>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Lista de eventos */}
@@ -225,80 +330,6 @@ export const EventsPage = ({ onNavigate }: EventsPageProps) => {
           </div>
         </div>
 
-        {/* Detalle del evento seleccionado */}
-        {selectedEvent && (
-          <div className="mt-8 bg-[#111] border border-[var(--neon-green)] rounded-lg p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <h2 className="text-3xl mb-4 text-[var(--neon-green)]">{selectedEvent.nombre}</h2>
-                <p className="text-gray-300 mb-6">{selectedEvent.descripcion}</p>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-5 h-5 text-[var(--neon-green)]" />
-                    <div>
-                      <p className="text-gray-400 text-sm">Fecha</p>
-                      <p className="text-white">
-                        {new Date(selectedEvent.fecha).toLocaleDateString('es-CL', {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <MapPin className="w-5 h-5 text-[var(--neon-green)]" />
-                    <div>
-                      <p className="text-gray-400 text-sm">Ubicación</p>
-                      <p className="text-white">{selectedEvent.ubicacion}</p>
-                      <p className="text-gray-500 text-sm">{selectedEvent.ciudad}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <Award className="w-5 h-5 text-[var(--neon-green)]" />
-                    <div>
-                      <p className="text-gray-400 text-sm">Puntos LevelUp</p>
-                      <p className="text-white font-bold text-xl">{selectedEvent.puntosLevelUp} puntos</p>
-                      <p className="text-gray-500 text-xs">Por asistir a este evento</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col justify-center">
-                <div className="bg-gradient-to-br from-[var(--neon-green)]/20 to-[var(--neon-purple)]/20 border border-[var(--neon-green)] rounded-lg p-6 mb-6">
-                  <h3 className="text-xl mb-4 text-[var(--neon-green)]">¿Cómo ganar puntos?</h3>
-                  <ul className="space-y-2 text-gray-300 text-sm">
-                    <li className="flex items-start gap-2">
-                      <span className="text-[var(--neon-green)]">✓</span>
-                      <span>Asiste al evento y regístrate en el stand de Level-Up Gamer</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-[var(--neon-green)]">✓</span>
-                      <span>Muestra tu código de usuario o correo registrado</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-[var(--neon-green)]">✓</span>
-                      <span>Los puntos se acreditarán automáticamente a tu cuenta</span>
-                    </li>
-                  </ul>
-                </div>
-                
-                <Button
-                  onClick={() => handleClaimPoints(selectedEvent)}
-                  className="w-full bg-[var(--neon-green)] text-black hover:bg-[var(--neon-purple)] hover:text-white"
-                >
-                  <Award className="w-5 h-5 mr-2" />
-                  Reclamar Puntos (Simulado)
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
