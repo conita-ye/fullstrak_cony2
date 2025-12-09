@@ -39,12 +39,21 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     try {
       setLoading(true);
       const cartData = await apiService.getCarrito(user.id);
-      setCart(cartData.items || []);
+      // Asegurar que todos los items tengan price y subtotal definidos
+      const safeItems = (cartData.items || []).map((item: any) => ({
+        productId: item.productId || item.product?.id || 0,
+        productName: item.productName || item.product?.nombre || 'Producto sin nombre',
+        quantity: item.quantity || 1,
+        price: item.price || item.product?.precio || 0,
+        subtotal: item.subtotal || (item.price || item.product?.precio || 0) * (item.quantity || 1),
+      }));
+      setCart(safeItems);
     } catch (error: any) {
       console.error('Error al cargar carrito:', error);
       if (error.response?.status !== 404) {
         toast.error('Error al cargar el carrito');
       }
+      setCart([]);
     } finally {
       setLoading(false);
     }

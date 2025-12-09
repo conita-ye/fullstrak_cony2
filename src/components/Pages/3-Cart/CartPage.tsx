@@ -17,8 +17,8 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
   const [codigoReferido, setCodigoReferido] = useState('');
   const [descuento, setDescuento] = useState(0);
 
-  const subtotal = getCartTotal();
-  const total = subtotal - descuento;
+  const subtotal = getCartTotal() || 0;
+  const total = Math.max(0, subtotal - descuento);
 
   if (loading) {
     return (
@@ -62,7 +62,7 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-center">
           <ShoppingBag className="w-24 h-24 mx-auto mb-6 text-gray-600" />
           <h2 className="text-3xl mb-4 text-gray-400">Tu carrito está vacío</h2>
@@ -81,7 +81,7 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4">
+    <div className="min-h-screen py-8 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl mb-8 text-[var(--neon-green)]">Carrito de Compras</h1>
 
@@ -101,7 +101,7 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
                     {item.productName}
                   </h3>
                   <div className="text-[var(--neon-green)] text-xl mb-2">
-                    {formatPrice(item.price)}
+                    {formatPrice(item.price || 0)}
                   </div>
                 </div>
 
@@ -129,7 +129,7 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
                   {/* Subtotal y eliminar */}
                   <div className="text-right">
                     <div className="text-white mb-2">
-                      Subtotal: {formatPrice(item.subtotal)}
+                      Subtotal: {formatPrice(item.subtotal || (item.price || 0) * item.quantity)}
                     </div>
                     <button
                       onClick={async () => {

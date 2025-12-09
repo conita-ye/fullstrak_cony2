@@ -45,7 +45,10 @@ export const validateProductCode = (code: string): boolean => {
 };
 
 // Formatear precio chileno
-export const formatPrice = (price: number): string => {
+export const formatPrice = (price: number | undefined | null): string => {
+  if (price === undefined || price === null || isNaN(price)) {
+    return '$0';
+  }
   if (price === 0) return 'FREE';
   return `$${price.toLocaleString('es-CL')}`;
 };

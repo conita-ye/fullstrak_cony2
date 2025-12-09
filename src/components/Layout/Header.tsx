@@ -67,17 +67,19 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
 
           <div className="flex items-center gap-4 flex-shrink-0">
 
-            <button
-              onClick={() => onNavigate('cart')}
-              className="relative p-2 text-white hover:text-yellow-400 transition-colors hidden md:block" 
-            >
-              <ShoppingCart className="w-6 h-6" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"> 
-                  {cartCount}
-                </span>
-              )}
-            </button>
+            {isAuthenticated && (
+              <button
+                onClick={() => onNavigate('cart')}
+                className="relative p-2 text-white hover:text-yellow-400 transition-colors" 
+              >
+                <ShoppingCart className="w-6 h-6" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"> 
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+            )}
 
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
@@ -106,17 +108,19 @@ export const Header = ({ onNavigate, currentPage }: HeaderProps) => {
             )}
 
             <div className="flex items-center gap-2 md:hidden">
-              <button
-                onClick={() => onNavigate('cart')}
-                className="relative p-2 text-white hover:text-yellow-400 transition-colors"
-              >
-                <ShoppingCart className="w-6 h-6" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                    {cartCount}
-                  </span>
-                )}
-              </button>
+              {isAuthenticated && (
+                <button
+                  onClick={() => onNavigate('cart')}
+                  className="relative p-2 text-white hover:text-yellow-400 transition-colors"
+                >
+                  <ShoppingCart className="w-6 h-6" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
+              )}
               
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}

@@ -155,18 +155,22 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
       return;
     }
 
-    // 1. Crear el payload sin `confirmPassword`
+    // 1. Crear el payload sin `confirmPassword` y `rol`
     // 2. Formatear el RUN antes de enviar (ej: 12.345.678-k)
-    const { confirmPassword, run, rol, ...dataToSend } = formData;
-    
-    // Aseguramos que el RUN se envíe formateado o limpio, según lo espere `register`
-    // Aquí usamos `formatRUN` para consistencia visual/de almacenamiento.
-    const runFormateado = formatRUN(run); 
+    // 3. Convertir nombres de campos: email -> correo, password -> contrasena
+    const runFormateado = formatRUN(formData.run); 
 
     const payload = {
-        ...dataToSend,
         run: runFormateado,
-        contrasena: dataToSend.password,
+        nombre: formData.nombre,
+        apellidos: formData.apellidos,
+        correo: formData.email,
+        contrasena: formData.password,
+        fechaNacimiento: formData.fechaNacimiento,
+        direccion: formData.direccion,
+        region: formData.region,
+        comuna: formData.comuna,
+        codigoReferido: formData.codigoReferido || undefined,
     };
 
     const success = await register(payload);
@@ -346,7 +350,7 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
               <div>
                 <label className="text-gray-300 mb-2 block">Región *</label>
                 <Select
-                  value={formData.region}
+                  value={formData.region || undefined}
                   onValueChange={(value: any) => {
                     setFormData(prev => ({ 
                       ...prev, 
@@ -358,13 +362,15 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
                   <SelectTrigger className="bg-[#1a1a1a] border-gray-700 text-white">
                     <SelectValue placeholder="Selecciona región" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {regiones.map((region) => (
-                      <SelectItem key={region.nombre} value={region.nombre}>
-                        {region.nombre}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+                  {regiones.length > 0 && (
+                    <SelectContent>
+                      {regiones.map((region) => (
+                        <SelectItem key={region.nombre} value={region.nombre}>
+                          {region.nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  )}
                 </Select>
                 {errors.region && <p className="text-red-500 text-sm mt-1">{errors.region}</p>}
               </div>
