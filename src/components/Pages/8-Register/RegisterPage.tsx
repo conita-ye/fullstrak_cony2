@@ -23,6 +23,7 @@ interface UserData {
   region: string;
   comuna: string;
   rol: UserRole;
+  codigoReferido: string;
 }
 
 type RegisterPayload = Omit<UserData, 'confirmPassword'>;
@@ -159,9 +160,10 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
     // 1. Crear el payload sin `confirmPassword` y `rol`
     // 2. Formatear el RUN antes de enviar (ej: 12.345.678-k)
     // 3. Convertir nombres de campos: email -> correo, password -> contrasena
+    // 4. Solo incluir codigoReferido si tiene valor (no enviar undefined o string vacío)
     const runFormateado = formatRUN(formData.run); 
 
-    const payload = {
+    const payload: any = {
         run: runFormateado,
         nombre: formData.nombre,
         apellidos: formData.apellidos,
@@ -171,8 +173,12 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
         direccion: formData.direccion,
         region: formData.region,
         comuna: formData.comuna,
-        codigoReferido: formData.codigoReferido || undefined,
     };
+
+    // Solo agregar codigoReferido si tiene valor
+    if (formData.codigoReferido && formData.codigoReferido.trim() !== '') {
+      payload.codigoReferido = formData.codigoReferido.trim();
+    }
 
     const success = await register(payload);
 
@@ -356,7 +362,7 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
                 <label className="text-gray-300 mb-2 block">Región *</label>
                 <Select
                   value={formData.region || undefined}
-                  onValueChange={(value: any) => {
+                  onValueChange={(value: string) => {
                     setFormData(prev => ({ 
                       ...prev, 
                       region: value, 
