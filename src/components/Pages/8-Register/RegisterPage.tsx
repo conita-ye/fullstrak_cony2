@@ -64,7 +64,11 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
         setRegiones(regionesData);
       } catch (error) {
         console.error('Error al cargar regiones:', error);
-        toast.error('Error al cargar regiones');
+        // No mostrar error si el endpoint no existe, usar datos por defecto
+        setRegiones([
+          { nombre: 'Región Metropolitana', comunas: ['Santiago', 'Providencia', 'Las Condes', 'Ñuñoa'] },
+          { nombre: 'Valparaíso', comunas: ['Valparaíso', 'Viña del Mar', 'Quilpué'] },
+        ]);
       } finally {
         setLoadingRegiones(false);
       }
@@ -175,8 +179,16 @@ export const RegisterPage = ({ onNavigate }: RegisterPageProps) => {
 
   // --- Renderizado ---
 
+  if (loadingRegiones) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-400">Cargando formulario...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-black">
       <div className="max-w-2xl w-full">
         {/* Título */}
         <div className="text-center mb-8">

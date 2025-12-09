@@ -134,23 +134,6 @@ export const LoginPage = ({ onNavigate }: LoginPageProps) => {
             </div>
           </form>
 
-          {/* Link a registro (alternativo) */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-400">
-              ¿No tienes cuenta?{' '}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onNavigate('register');
-                }}
-                className="text-[var(--neon-green)] hover:text-[var(--neon-purple)] transition-colors font-semibold underline"
-              >
-                Regístrate aquí
-              </button>
-            </p>
-          </div>
-
           {/* Credenciales de prueba */}
           <div className="mt-6 pt-6 border-t border-gray-800">
             <p className="text-xs text-gray-500 mb-2">Credenciales de prueba:</p>
