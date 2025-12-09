@@ -13,7 +13,7 @@ interface CartPageProps {
 
 export const CartPage = ({ onNavigate }: CartPageProps) => {
   const { cart, removeFromCart, updateQuantity, getCartTotal, clearCart, loading } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const [codigoReferido, setCodigoReferido] = useState('');
   const [descuento, setDescuento] = useState(0);
 
