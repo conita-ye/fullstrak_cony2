@@ -4,11 +4,11 @@ import { HomePage } from "./HomePage";
 
 // Mock de contextos
 vi.mock("@/contexts/CartContext", () => ({
-  useCart: () => ({
+            useCart: () => ({
     addToCart: vi.fn(),
     getCartItemsCount: () => 0,
-  }),
-}));
+            }),
+        }));
 
 vi.mock("@/contexts/AuthContext", () => ({
   useAuth: () => ({
@@ -21,15 +21,15 @@ vi.mock("@/services/api", () => ({
   apiService: {
     getProductosDestacados: vi.fn().mockResolvedValue([]),
     getProductos: vi.fn().mockResolvedValue([]),
-  },
-}));
+                },
+            }));
 
 describe('HomePage - Pruebas de Renderizado', () => {
   const mockNavigate = vi.fn();
 
   beforeEach(() => {
     mockNavigate.mockClear();
-  });
+    });
 
   test("1. Debe renderizar el componente HomePage correctamente", () => {
     const { container } = render(<HomePage onNavigate={mockNavigate} />);
