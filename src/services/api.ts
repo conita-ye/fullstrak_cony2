@@ -24,6 +24,11 @@ class ApiService {
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
+        // Si se está enviando FormData, eliminar Content-Type para que axios lo establezca automáticamente
+        if (config.data instanceof FormData) {
+          // Eliminar Content-Type para que axios establezca multipart/form-data con boundary
+          delete (config.headers as any)['Content-Type'];
+        }
         return config;
       },
       (error) => {
@@ -164,7 +169,14 @@ class ApiService {
   }
 
   async createProducto(producto: any) {
-    const response = await this.api.post('/products', producto);
+    // El backend espera multipart/form-data con @RequestPart("producto")
+    const formData = new FormData();
+    const productoJson = JSON.stringify(producto);
+    const productoBlob = new Blob([productoJson], { type: 'application/json' });
+    formData.append('producto', productoBlob);
+    
+    // El interceptor eliminará automáticamente Content-Type cuando detecte FormData
+    const response = await this.api.post('/products', formData);
     return response.data;
   }
 
@@ -206,6 +218,84 @@ class ApiService {
       puntosRequeridos,
       valor,
     });
+    return response.data;
+  }
+
+  // Métodos para usuarios (admin)
+  async getUsuarios() {
+    const response = await this.api.get('/users');
+    return response.data;
+  }
+
+  async getRoles() {
+    const response = await this.api.get('/users/roles');
+    return response.data;
+  }
+
+  async crearUsuarioAdmin(userData: any) {
+    const response = await this.api.post('/users/admin', userData);
+    return response.data;
+  }
+
+  async eliminarUsuario(id: number) {
+    // El backend devuelve 204 No Content, así que validamos el status
+    const response = await this.api.delete(`/users/${id}`, {
+      validateStatus: (status) => status === 204 || status === 200,
+    });
+    return response;
+  }
+
+  // Métodos para boletas/órdenes
+  async getBoletas() {
+    const response = await this.api.get('/boletas');
+    return response.data;
+  }
+
+  async getBoletasPorUsuario(userId: number) {
+    const response = await this.api.get(`/boletas/user/${userId}`);
+    return response.data;
+  }
+
+  async getBoleta(id: number) {
+    const response = await this.api.get(`/boletas/${id}`);
+    return response.data;
+  }
+
+  async actualizarEstadoBoleta(id: number, estado: string) {
+    const response = await this.api.put(`/boletas/${id}/estado`, { estado });
+    return response.data;
+  }
+
+  async cancelarBoleta(id: number) {
+    const response = await this.api.delete(`/boletas/${id}`);
+    return response.data;
+  }
+
+  // Métodos para categorías
+  async getCategorias(includeInactive: boolean = false) {
+    const response = await this.api.get('/categories', {
+      params: { includeInactive },
+    });
+    return response.data;
+  }
+
+  async getCategoria(id: number) {
+    const response = await this.api.get(`/categories/${id}`);
+    return response.data;
+  }
+
+  async createCategoria(categoria: any) {
+    const response = await this.api.post('/categories', categoria);
+    return response.data;
+  }
+
+  async updateCategoria(id: number, categoria: any) {
+    const response = await this.api.put(`/categories/${id}`, categoria);
+    return response.data;
+  }
+
+  async deleteCategoria(id: number) {
+    const response = await this.api.delete(`/categories/${id}`);
     return response.data;
   }
 }

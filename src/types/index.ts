@@ -59,3 +59,32 @@ export interface Region {
   nombre: string;
   comunas: string[];
 }
+
+export interface Boleta {
+  id: number;
+  numeroBoleta: string;
+  fechaCreacion: string;
+  fechaActualizacion: string;
+  total: number;
+  estado: string;
+  usuarioId: number;
+  usuarioNombre?: string;
+  detalle?: BoletaDetalle[];
+}
+
+export interface BoletaDetalle {
+  id: number;
+  productoId: number;
+  productoNombre?: string;
+  cantidad: number;
+  precioUnitario: number;
+  subtotal: number;
+}
+
+export interface Categoria {
+  id: number;
+  codigo: string;
+  nombre: string;
+  descripcion?: string;
+  activa: boolean;
+}

@@ -6,6 +6,7 @@ import { Award, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getLevelByPoints, getNextLevel, getPointsToNextLevel, getProgressToNextLevel } from '@/utils/pointsSystem';
+import { toast } from 'sonner';
 import HomeCarousel from './HomeComponents/Carrusel';
 import Beneficios from './HomeComponents/Beneficios';
 import ProductosDestacados from './HomeComponents/ProductosDestacados';
@@ -151,7 +152,7 @@ export const HomePage = ({ onNavigate }: HomePageProps) => {
                   </div>
                 </div>
                 <Button
-                  onClick={() => onNavigate('points')}
+                  onClick={() => toast.info('Próximamente: Sistema de puntos en desarrollo', { duration: 2000 })}
                   className="bg-[var(--neon-green)] text-black hover:bg-[var(--neon-purple)] hover:text-white"
                 >
                   <Award className="w-4 h-4 mr-2" />

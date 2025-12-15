@@ -3,6 +3,7 @@ import { MessageCircle, Mail, Phone, MapPin, Send } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Textarea } from '../../ui/textarea';
+import { validateEmail } from '@/utils/validations';
 import { toast } from 'sonner';
 
 export const ContactPage = () => {
@@ -11,11 +12,80 @@ export const ContactPage = () => {
     email: '',
     mensaje: '',
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleChange = (key: string, value: string) => {
+    // Limpiar error al cambiar valor
+    if (errors[key]) {
+      setErrors(prev => {
+        const { [key]: _, ...rest } = prev;
+        return rest;
+      });
+    }
+
+    // Aplicar restricciones según el campo
+    if (key === 'nombre') {
+      // Solo letras y espacios, máximo 50 caracteres
+      const cleaned = value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '');
+      if (cleaned.length <= 50) {
+        setFormData(prev => ({ ...prev, [key]: cleaned }));
+      }
+    } else if (key === 'email') {
+      // Email máximo 100 caracteres
+      if (value.length <= 100) {
+        setFormData(prev => ({ ...prev, [key]: value }));
+      }
+    } else if (key === 'mensaje') {
+      // Mensaje máximo 500 caracteres
+      if (value.length <= 500) {
+        setFormData(prev => ({ ...prev, [key]: value }));
+      }
+    }
+  };
+
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    // Validación de nombre
+    if (!formData.nombre.trim()) {
+      newErrors.nombre = 'El nombre es obligatorio';
+    } else if (formData.nombre.trim().length < 2) {
+      newErrors.nombre = 'El nombre debe tener al menos 2 caracteres';
+    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(formData.nombre)) {
+      newErrors.nombre = 'El nombre solo puede contener letras y espacios';
+    }
+
+    // Validación de email
+    if (!formData.email) {
+      newErrors.email = 'El correo es obligatorio';
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = 'Correo inválido. Dominios permitidos: @duoc.cl, @profesor.duoc.cl, @gmail.com';
+    }
+
+    // Validación de mensaje
+    if (!formData.mensaje.trim()) {
+      newErrors.mensaje = 'El mensaje es obligatorio';
+    } else if (formData.mensaje.trim().length < 10) {
+      newErrors.mensaje = 'El mensaje debe tener al menos 10 caracteres';
+    } else if (formData.mensaje.trim().length > 500) {
+      newErrors.mensaje = 'El mensaje no puede tener más de 500 caracteres';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validate()) {
+      toast.error('Por favor corrige los errores del formulario');
+      return;
+    }
+
     toast.success('Mensaje enviado correctamente (simulado)');
     setFormData({ nombre: '', email: '', mensaje: '' });
+    setErrors({});
   };
 
   const handleWhatsApp = () => {
@@ -111,10 +181,12 @@ export const ContactPage = () => {
                     type="text"
                     placeholder="Tu nombre"
                     value={formData.nombre}
-                    onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                    required
+                    maxLength={50}
+                    onChange={(e) => handleChange('nombre', e.target.value)}
                     className="bg-[#1a1a1a] border-gray-700 text-white"
                   />
+                  {errors.nombre && <p className="text-red-500 text-sm mt-1">{errors.nombre}</p>}
+                  <p className="text-xs text-gray-500 mt-1">Solo letras (máx. 50 caracteres)</p>
                 </div>
 
                 <div>
@@ -125,10 +197,12 @@ export const ContactPage = () => {
                     type="email"
                     placeholder="tu@email.com"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    required
+                    maxLength={100}
+                    onChange={(e) => handleChange('email', e.target.value)}
                     className="bg-[#1a1a1a] border-gray-700 text-white"
                   />
+                  {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                  <p className="text-xs text-gray-500 mt-1">Dominios permitidos: @duoc.cl, @profesor.duoc.cl, @gmail.com</p>
                 </div>
 
                 <div>
@@ -138,10 +212,14 @@ export const ContactPage = () => {
                   <Textarea
                     placeholder="Escribe tu mensaje aquí..."
                     value={formData.mensaje}
-                    onChange={(e) => setFormData({ ...formData, mensaje: e.target.value })}
-                    required
+                    maxLength={500}
+                    onChange={(e) => handleChange('mensaje', e.target.value)}
                     className="bg-[#1a1a1a] border-gray-700 text-white min-h-[150px]"
                   />
+                  {errors.mensaje && <p className="text-red-500 text-sm mt-1">{errors.mensaje}</p>}
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formData.mensaje.length}/500 caracteres (mínimo 10)
+                  </p>
                 </div>
 
                 <Button

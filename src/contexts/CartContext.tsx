@@ -9,6 +9,7 @@ interface CartItem {
   quantity: number;
   price: number;
   subtotal: number;
+  stock?: number; // Stock disponible del producto
 }
 
 interface CartContextType {
@@ -46,6 +47,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         quantity: item.quantity || 1,
         price: item.price || item.product?.precio || 0,
         subtotal: item.subtotal || (item.price || item.product?.precio || 0) * (item.quantity || 1),
+        stock: item.stock !== undefined ? item.stock : (item.product?.stock || 0), // Stock disponible del backend
       }));
       setCart(safeItems);
     } catch (error: any) {
@@ -74,11 +76,29 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
 
     try {
+      // Verificar stock antes de agregar
+      try {
+        const producto = await apiService.getProducto(String(productId));
+        const stockDisponible = producto.stock || 0;
+        
+        // Verificar si ya está en el carrito
+        const itemEnCarrito = cart.find(item => item.productId === productId);
+        const cantidadActual = itemEnCarrito ? itemEnCarrito.quantity : 0;
+        const cantidadTotal = cantidadActual + cantidad;
+        
+        if (cantidadTotal > stockDisponible) {
+          toast.error(`Solo hay ${stockDisponible} unidades disponibles en stock`);
+          return;
+        }
+      } catch (productError) {
+        console.warn('No se pudo verificar stock del producto, continuando...', productError);
+      }
+
       await apiService.addToCart(user.id, productId, cantidad);
       await loadCart();
-      toast.success('Producto agregado al carrito');
+      toast.success('Producto agregado', { duration: 2000 });
     } catch (error: any) {
-      const errorMessage = error.response?.data?.error || 'Error al agregar producto al carrito';
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || 'Error al agregar producto al carrito';
       toast.error(errorMessage);
     }
   };
@@ -111,6 +131,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     try {
       const currentItem = cart.find((item) => item.productId === productId);
       if (!currentItem) {
+        return;
+      }
+
+      // Validar que la cantidad no exceda el stock disponible
+      const stockDisponible = currentItem.stock || 0;
+      if (cantidad > stockDisponible) {
+        toast.error(`Solo hay ${stockDisponible} unidades disponibles en stock`);
         return;
       }
 

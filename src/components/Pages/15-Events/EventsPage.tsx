@@ -205,40 +205,40 @@ export const EventsPage = ({ onNavigate }: EventsPageProps) => {
                       </div>
                       <div className="flex flex-wrap gap-2 mt-2">
                         {selectedEvent.id === 1 && (
-                          <>
+                          <div className="flex flex-wrap gap-2">
                             <Badge className="bg-[var(--neon-purple)] text-white">League of Legends</Badge>
                             <Badge className="bg-[var(--neon-purple)] text-white">CS2</Badge>
                             <Badge className="bg-[var(--neon-purple)] text-white">Valorant</Badge>
                             <Badge className="bg-[var(--neon-purple)] text-white">Rocket League</Badge>
-                          </>
+                          </div>
                         )}
                         {selectedEvent.id === 2 && (
-                          <>
+                          <div className="flex flex-wrap gap-2">
                             <Badge className="bg-[var(--neon-purple)] text-white">Exposición</Badge>
                             <Badge className="bg-[var(--neon-purple)] text-white">Demostraciones</Badge>
                             <Badge className="bg-[var(--neon-purple)] text-white">Descuentos</Badge>
-                          </>
+                          </div>
                         )}
                         {selectedEvent.id === 3 && (
-                          <>
+                          <div className="flex flex-wrap gap-2">
                             <Badge className="bg-[var(--neon-purple)] text-white">PlayStation 6</Badge>
                             <Badge className="bg-[var(--neon-purple)] text-white">Exclusivo</Badge>
                             <Badge className="bg-[var(--neon-purple)] text-white">Lanzamiento</Badge>
-                          </>
+                          </div>
                         )}
                         {selectedEvent.id === 4 && (
-                          <>
+                          <div className="flex flex-wrap gap-2">
                             <Badge className="bg-[var(--neon-purple)] text-white">League of Legends</Badge>
                             <Badge className="bg-[var(--neon-purple)] text-white">CS2</Badge>
                             <Badge className="bg-[var(--neon-purple)] text-white">Valorant</Badge>
-                          </>
+                          </div>
                         )}
                         {selectedEvent.id === 5 && (
-                          <>
+                          <div className="flex flex-wrap gap-2">
                             <Badge className="bg-[var(--neon-purple)] text-white">Streamers</Badge>
                             <Badge className="bg-[var(--neon-purple)] text-white">Cosplay</Badge>
                             <Badge className="bg-[var(--neon-purple)] text-white">Torneos</Badge>
-                          </>
+                          </div>
                         )}
                       </div>
                     </div>

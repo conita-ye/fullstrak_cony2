@@ -123,8 +123,16 @@ export const CartPage = ({ onNavigate }: CartPageProps) => {
                       {item.quantity}
                     </span>
                     <button
-                      onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                      className="p-2 text-gray-400 hover:text-[var(--neon-green)] transition-colors"
+                      onClick={() => {
+                        const stockDisponible = (item as any).stock || 0;
+                        if (item.quantity >= stockDisponible) {
+                          toast.error(`Solo hay ${stockDisponible} unidades disponibles en stock`);
+                        } else {
+                          updateQuantity(item.productId, item.quantity + 1);
+                        }
+                      }}
+                      disabled={(item as any).stock !== undefined && item.quantity >= ((item as any).stock || 0)}
+                      className="p-2 text-gray-400 hover:text-[var(--neon-green)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Plus className="w-4 h-4" />
                     </button>

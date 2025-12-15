@@ -125,7 +125,7 @@ export default function App() {
             <Header onNavigate={handleNavigate} currentPage={navigationState.page} />
             <main className="flex-1">{renderPage()}</main>
             <Footer />
-            <Toaster position="top-right" theme="dark" />
+            <Toaster position="top-right" theme="dark" duration={2000} />
           </div>
         </NavigationProvider>
       </CartProvider>

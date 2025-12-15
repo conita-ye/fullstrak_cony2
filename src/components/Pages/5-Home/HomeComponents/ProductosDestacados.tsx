@@ -7,9 +7,29 @@ import type { Props } from '../Interface/Props';
 
 
 const ProductosDestacados: React.FC<Props> = ({ productos, onNavigate, addToCart }) => {
-  const handleAddToCart = (id: string) => {
-    addToCart(id, 1);
-    toast.success('Producto agregado al carrito');
+  const handleAddToCart = async (id: string) => {
+    try {
+      // Obtener el producto para verificar el stock
+      const producto = productos.find(p => p.id === id);
+      if (!producto) {
+        toast.error('Producto no encontrado');
+        return;
+      }
+      
+      // Verificar stock disponible
+      if (producto.stock <= 0) {
+        toast.error('Producto sin stock disponible');
+        return;
+      }
+      
+      // Verificar si ya hay items en el carrito para este producto
+      // Por ahora, solo agregamos 1 unidad y el backend validará el stock
+      await addToCart(id, 1);
+      toast.success('Producto agregado', { duration: 2000 });
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.error || error.message || 'Error al agregar producto al carrito';
+      toast.error(errorMessage);
+    }
   };
 
   return (

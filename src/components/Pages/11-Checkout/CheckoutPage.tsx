@@ -37,19 +37,29 @@ export const CheckoutPage = ({ onNavigate }: CheckoutPageProps) => {
   });
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      setFormData({
-        ...formData,
+    cargarRegiones();
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated && user && regiones.length > 0) {
+      setFormData(prev => ({
+        ...prev,
         nombre: user.nombre || '',
         apellidos: user.apellidos || '',
         correo: user.correo || '',
         direccion: user.direccion || '',
         region: user.region || '',
         comuna: user.comuna || '',
-      });
+      }));
+      // Cargar comunas si hay región
+      if (user.region) {
+        const regionSeleccionada = regiones.find((r) => r.nombre === user.region);
+        if (regionSeleccionada && regionSeleccionada.comunas) {
+          setComunas(regionSeleccionada.comunas);
+        }
+      }
     }
-    cargarRegiones();
-  }, [user]);
+  }, [user, isAuthenticated, regiones]);
 
   const cargarRegiones = async () => {
     try {
@@ -62,9 +72,16 @@ export const CheckoutPage = ({ onNavigate }: CheckoutPageProps) => {
 
   const handleRegionChange = (region: string) => {
     setFormData({ ...formData, region, comuna: '' });
-    // Simular comunas según región
-    setComunas(['Santiago', 'Providencia', 'Las Condes', 'Ñuñoa']);
+    // Obtener comunas de la región seleccionada
+    const regionSeleccionada = regiones.find((r) => r.nombre === region);
+    if (regionSeleccionada && regionSeleccionada.comunas) {
+      setComunas(regionSeleccionada.comunas);
+    } else {
+      setComunas([]);
+    }
   };
+
+  // No necesitamos este useEffect adicional, handleRegionChange ya maneja las comunas
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,7 +196,12 @@ export const CheckoutPage = ({ onNavigate }: CheckoutPageProps) => {
                   <Input
                     type="tel"
                     value={formData.telefono}
-                    onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 15);
+                      setFormData({ ...formData, telefono: value });
+                    }}
+                    placeholder="912345678"
+                    maxLength={15}
                     required
                     className="bg-[#1a1a1a] border-gray-700 text-white"
                   />
@@ -263,7 +285,11 @@ export const CheckoutPage = ({ onNavigate }: CheckoutPageProps) => {
                       <label className="text-gray-300 mb-2 block">Número de Tarjeta *</label>
                       <Input
                         value={formData.numeroTarjeta}
-                        onChange={(e) => setFormData({ ...formData, numeroTarjeta: e.target.value })}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 16);
+                          const formatted = value.replace(/(.{4})/g, '$1 ').trim();
+                          setFormData({ ...formData, numeroTarjeta: formatted });
+                        }}
                         placeholder="1234 5678 9012 3456"
                         maxLength={19}
                         className="bg-[#1a1a1a] border-gray-700 text-white"
@@ -284,7 +310,13 @@ export const CheckoutPage = ({ onNavigate }: CheckoutPageProps) => {
                         <label className="text-gray-300 mb-2 block">Fecha Vencimiento *</label>
                         <Input
                           value={formData.fechaVencimiento}
-                          onChange={(e) => setFormData({ ...formData, fechaVencimiento: e.target.value })}
+                          onChange={(e) => {
+                            let value = e.target.value.replace(/[^0-9]/g, '').slice(0, 4);
+                            if (value.length >= 2) {
+                              value = value.slice(0, 2) + '/' + value.slice(2);
+                            }
+                            setFormData({ ...formData, fechaVencimiento: value });
+                          }}
                           placeholder="MM/AA"
                           maxLength={5}
                           className="bg-[#1a1a1a] border-gray-700 text-white"
@@ -296,7 +328,10 @@ export const CheckoutPage = ({ onNavigate }: CheckoutPageProps) => {
                         <Input
                           type="password"
                           value={formData.cvv}
-                          onChange={(e) => setFormData({ ...formData, cvv: e.target.value })}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 3);
+                            setFormData({ ...formData, cvv: value });
+                          }}
                           placeholder="123"
                           maxLength={3}
                           className="bg-[#1a1a1a] border-gray-700 text-white"

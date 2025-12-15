@@ -16,7 +16,7 @@ interface User {
   fechaNacimiento: string;
   puntosLevelUp: number;
 }
-
+//d
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string, rol?: string) => Promise<boolean>;
