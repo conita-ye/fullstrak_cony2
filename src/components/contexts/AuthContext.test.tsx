@@ -1,22 +1,26 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { renderHook, act } from "@testing-library/react";
-import { AuthProvider, useAuth } from "./AuthContext";
+import { renderHook, act, waitFor } from "@testing-library/react";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 
-vi.mock("@/services/api", () => ({
-  apiService: {
-    login: vi.fn().mockResolvedValue({
-      accessToken: "token123",
-      refreshToken: "refresh123",
-      usuarioId: 1,
-    }),
-    getUsuario: vi.fn().mockResolvedValue({
-      id: 1,
-      nombre: "Test",
-      rol: "CLIENTE",
-    }),
-    register: vi.fn().mockResolvedValue({}),
-  },
-}));
+vi.mock("@/services/api", () => {
+  const mockGetUsuario = vi.fn().mockResolvedValue({
+    id: 1,
+    nombre: "Test",
+    rol: "CLIENTE",
+  });
+
+  return {
+    apiService: {
+      login: vi.fn().mockResolvedValue({
+        accessToken: "token123",
+        refreshToken: "refresh123",
+        usuarioId: 1,
+      }),
+      getUsuario: mockGetUsuario,
+      register: vi.fn().mockResolvedValue({}),
+    },
+  };
+});
 
 describe('AuthContext - Pruebas de Estado y Funciones', () => {
   beforeEach(() => {
@@ -24,10 +28,15 @@ describe('AuthContext - Pruebas de Estado y Funciones', () => {
     vi.clearAllMocks();
   });
 
-  test("52. Debe inicializar con usuario null si no hay token", () => {
+  test("52. Debe inicializar con usuario null si no hay token", async () => {
     const { result } = renderHook(() => useAuth(), {
       wrapper: AuthProvider,
     });
+    
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    }, { timeout: 3000 });
+    
     expect(result.current.user).toBeNull();
   });
 
@@ -39,17 +48,23 @@ describe('AuthContext - Pruebas de Estado y Funciones', () => {
       wrapper: AuthProvider,
     });
 
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    });
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    }, { timeout: 3000 });
 
-    expect(result.current.user).toBeTruthy();
+    await waitFor(() => {
+      expect(result.current.user).toBeTruthy();
+    }, { timeout: 3000 });
   });
 
   test("54. Debe ejecutar login correctamente", async () => {
     const { result } = renderHook(() => useAuth(), {
       wrapper: AuthProvider,
     });
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    }, { timeout: 3000 });
 
     await act(async () => {
       const success = await result.current.login("test@test.com", "password123");
@@ -66,6 +81,10 @@ describe('AuthContext - Pruebas de Estado y Funciones', () => {
     const { result } = renderHook(() => useAuth(), {
       wrapper: AuthProvider,
     });
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    }, { timeout: 3000 });
 
     act(() => {
       result.current.logout();

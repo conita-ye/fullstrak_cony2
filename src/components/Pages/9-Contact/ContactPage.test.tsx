@@ -16,6 +16,7 @@ describe('ContactPage - Pruebas de Renderizado', () => {
 
   test("90. Debe renderizar el formulario de contacto", () => {
     render(<ContactPage />);
-    expect(screen.getByText(/Contacto/i) || screen.getByText(/Contáctanos/i)).toBeTruthy();
+    const contactElements = screen.getAllByText(/Contacto/i);
+    expect(contactElements.length).toBeGreaterThan(0);
   });
 });

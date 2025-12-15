@@ -27,6 +27,10 @@ vi.mock("@/services/api", () => ({
     createProducto: vi.fn().mockResolvedValue({}),
     updateProducto: vi.fn().mockResolvedValue({}),
     deleteProducto: vi.fn().mockResolvedValue({}),
+    getRegiones: vi.fn().mockResolvedValue([
+      { nombre: "Región Metropolitana", comunas: ["Santiago", "Providencia"] },
+      { nombre: "Valparaíso", comunas: ["Valparaíso", "Viña del Mar"] },
+    ]),
   },
 }));
 

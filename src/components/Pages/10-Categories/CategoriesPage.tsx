@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Package, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ProductCard } from '@/components/Pages/3-Cart/Cart/ProductCard';
@@ -67,8 +67,8 @@ export const CategoriesPage = ({ onNavigate, initialData }: CategoriesPageProps)
     ? productos
     : productos.filter((p) => getCategoriaNombre(p.categoria) === selectedCategory);
 
-  const handleAddToCart = async (productId: number) => {
-    await addToCart(productId, 1);
+  const handleAddToCart = (productId: string) => {
+    addToCart(Number(productId), 1);
   };
 
   return (
